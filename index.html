@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FX Risk Management Dashboard - Demo</title>
+    <title>FX Management Financial Statement Impact</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
@@ -13,313 +13,475 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
             padding: 20px;
+            color: #333;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #2c3e50;
             color: white;
-            padding: 30px;
+            padding: 20px 30px;
             text-align: center;
         }
         
         .header h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
+            font-size: 1.8rem;
+            font-weight: bold;
             margin-bottom: 10px;
         }
         
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .date-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border-bottom: 1px solid #ddd;
         }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f8fafc;
+        .date-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-value {
-            font-size: 2.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .stat-label {
-            color: #64748b;
+        .date-label {
             font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 5px;
         }
         
-        .exposure-positive { color: #10b981; }
-        .exposure-negative { color: #ef4444; }
-        .var-warning { color: #f59e0b; }
-        .hedge-good { color: #8b5cf6; }
+        .date-value {
+            font-weight: bold;
+            padding: 5px 15px;
+            border: 2px solid #333;
+            background: white;
+        }
+        
+        .currency-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .currency-item {
+            text-align: center;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
         
         .chart-section {
-            padding: 40px 30px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
         
         .chart-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
             text-align: center;
-            color: #1e293b;
         }
         
         .chart-container {
             position: relative;
-            height: 400px;
-            margin-bottom: 30px;
+            height: 300px;
         }
         
-        .insights {
-            background: #f1f5f9;
-            padding: 25px;
-            border-radius: 15px;
+        .metrics-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .metric-box {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .metric-header {
+            background: #34495e;
+            color: white;
+            padding: 12px 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .metric-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .metric-item {
+            padding: 15px;
+            text-align: center;
+            border-right: 1px solid #ddd;
+        }
+        
+        .metric-item:last-child {
+            border-right: none;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        
+        .tables-section {
+            grid-column: 1 / -1;
             margin-top: 20px;
         }
         
-        .insights h3 {
-            color: #1e293b;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+        .tables-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
         }
         
-        .insight-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: white;
+        .table-container {
+            background: #fafafa;
+            border: 1px solid #ddd;
             border-radius: 8px;
+            overflow: hidden;
         }
         
-        .insight-icon {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 12px;
-        }
-        
-        .insight-high { background: #ef4444; }
-        .insight-medium { background: #f59e0b; }
-        .insight-low { background: #10b981; }
-        
-        .cta-section {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        .table-title {
+            background: #34495e;
             color: white;
-            padding: 40px 30px;
+            padding: 12px 15px;
+            font-weight: bold;
             text-align: center;
         }
         
-        .cta-button {
-            background: #10b981;
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #ecf0f1;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+        }
+        
+        .data-table td:first-child {
+            text-align: left;
+        }
+        
+        .var-section {
+            grid-column: 1 / -1;
             margin-top: 20px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
-        .cta-button:hover {
-            background: #059669;
-            transform: scale(1.05);
-        }
-        
-        .demo-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #ef4444;
+        .var-header {
+            background: #34495e;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 12px 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .var-content {
+            padding: 20px;
+        }
+        
+        .var-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .var-item {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        
+        .confidence-value {
+            background: #d5f4e6;
             font-weight: bold;
         }
         
         @media (max-width: 768px) {
-            .header h1 { font-size: 2rem; }
-            .stats-grid { grid-template-columns: 1fr; padding: 20px; }
-            .chart-section { padding: 30px 20px; }
+            .main-content { grid-template-columns: 1fr; }
+            .tables-grid { grid-template-columns: 1fr; }
+            .date-info { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
 <body>
-    <div class="demo-badge">DEMO</div>
-    
     <div class="container">
         <div class="header">
-            <h1>FX Risk Management Dashboard</h1>
-            <p>Mexican Peso Exposure Analysis • Updated: December 2024</p>
+            <h1>FX Management Financial Statement Impact - Mexico</h1>
         </div>
         
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value exposure-negative">$4.2M</div>
-                <div class="stat-label">Total MXN Exposure</div>
+        <div class="date-info">
+            <div class="date-section">
+                <div class="date-label">Date</div>
+                <div class="date-value">5/1/25</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value var-warning">$187K</div>
-                <div class="stat-label">Monthly VaR (95%)</div>
+            <div class="date-section">
+                <div class="date-label">Functional Currency</div>
+                <div class="date-value">MXN</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value hedge-good">67%</div>
-                <div class="stat-label">Hedge Ratio</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value exposure-negative">-$89K</div>
-                <div class="stat-label">MTD P&L Impact</div>
-            </div>
-        </div>
-        
-        <div class="chart-section">
-            <h2 class="chart-title">FX Exposure Impact by Business Unit</h2>
-            <div class="chart-container">
-                <canvas id="exposureChart"></canvas>
+            <div class="date-section">
+                <div class="date-label">Exposure</div>
+                <div class="date-value">USD</div>
             </div>
             
-            <div class="insights">
-                <h3>Key Risk Insights</h3>
-                <div class="insight-item">
-                    <div class="insight-icon insight-high"></div>
-                    <span><strong>Manufacturing Plant A:</strong> $1.8M unhedged exposure represents 67% of total risk</span>
+            <div class="currency-info">
+                <div class="currency-item">
+                    <div class="date-label">Transactional Currency</div>
+                    <div class="date-value">USD</div>
                 </div>
-                <div class="insight-item">
-                    <div class="insight-icon insight-medium"></div>
-                    <span><strong>Intercompany Loans:</strong> $850K USD loans to Mexican entities creating natural hedge opportunity</span>
+                <div class="currency-item">
+                    <div class="date-label">Functional Currency</div>
+                    <div class="date-value">MXN</div>
                 </div>
-                <div class="insight-item">
-                    <div class="insight-icon insight-low"></div>
-                    <span><strong>Cash Balances:</strong> $320K peso cash providing operational buffer but minimal FX risk</span>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon insight-high"></div>
-                    <span><strong>Recommendation:</strong> Increase hedge ratio to 80% to reduce monthly VaR by $45K</span>
+                <div class="currency-item">
+                    <div class="date-label">Region</div>
+                    <div class="date-value">Mexico</div>
                 </div>
             </div>
         </div>
         
-        <div class="cta-section">
-            <h2>Stop Flying Blind with Your FX Risk</h2>
-            <p>Get a comprehensive assessment of your Mexican peso exposure and see exactly where your company is vulnerable.</p>
-            <button class="cta-button" onclick="window.open('mailto:your-email@company.com?subject=FX Risk Assessment Request', '_blank')">
-                Request Free Assessment
-            </button>
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-title">Net Position M-o-M</div>
+                <div class="chart-container">
+                    <canvas id="netPositionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <div class="metric-box">
+                    <div class="metric-header">Variable Contribution Margin Exposure</div>
+                    <div class="metric-content">
+                        <div class="metric-item">
+                            <div class="metric-value">131,338</div>
+                            <div class="metric-label"></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value negative">12,160</div>
+                            <div class="metric-label">P&L Value at Risk</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-box">
+                    <div class="metric-header">Unrealized FX Exposure</div>
+                    <div class="metric-content">
+                        <div class="metric-item">
+                            <div class="metric-value">197,500</div>
+                            <div class="metric-label"></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value negative">18,286</div>
+                            <div class="metric-label">B/S Value at Risk</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tables-section">
+            <div class="tables-grid">
+                <div class="table-container">
+                    <div class="table-title">Operational Strategy (Annual)</div>
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td>Forecasted Long Position</td>
+                                <td>653,681</td>
+                            </tr>
+                            <tr>
+                                <td>Forecasted Short Position</td>
+                                <td>(522,343)</td>
+                            </tr>
+                            <tr>
+                                <td>SG&A and Others</td>
+                                <td>(117,764)</td>
+                            </tr>
+                            <tr style="border-top: 2px solid #333;">
+                                <td><strong>Net P&L Exposures</strong></td>
+                                <td><strong>21,238</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-title">Potential Impact on Financials ($USD 0'000)</div>
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td>Variable Contribution Margin (Annual Forecast)</td>
+                                <td>131,338</td>
+                            </tr>
+                            <tr>
+                                <td>Variable Contribution Margin Potential Loss</td>
+                                <td>12,160</td>
+                            </tr>
+                            <tr>
+                                <td>Income/(Loss) from Operations Potential Loss</td>
+                                <td>1,966</td>
+                            </tr>
+                            <tr>
+                                <td>Foreign Exchange Losses</td>
+                                <td>18,286</td>
+                            </tr>
+                            <tr>
+                                <td>EBTDA</td>
+                                <td>18,286</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-container" style="margin-top: 20px;">
+                <div class="table-title">Balance Sheet Management (Current Position)</div>
+                <table class="data-table">
+                    <tbody>
+                        <tr>
+                            <td>Current Long Position - B/S</td>
+                            <td>291,354</td>
+                        </tr>
+                        <tr>
+                            <td>Current Short Position - B/S</td>
+                            <td>(93,854)</td>
+                        </tr>
+                        <tr style="border-top: 2px solid #333;">
+                            <td><strong>B/S Net Exposure</strong></td>
+                            <td><strong>197,500</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="var-section">
+            <div class="var-header">Value at Risk</div>
+            <div class="var-content">
+                <div class="var-grid">
+                    <div class="var-item"><strong>Volatility</strong></div>
+                    <div class="var-item"><strong>0.19</strong></div>
+                    <div class="var-item"></div>
+                    
+                    <div class="var-item"><strong>Confidence Interval</strong></div>
+                    <div class="var-item confidence-value">0.95</div>
+                    <div class="var-item confidence-value">1.64</div>
+                    
+                    <div class="var-item"><strong>Time Horizon</strong></div>
+                    <div class="var-item"><strong>0.29</strong></div>
+                    <div class="var-item"><strong>Monthly</strong></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // FX Exposure Chart
-        const ctx = document.getElementById('exposureChart').getContext('2d');
+        // Net Position Chart
+        const ctx = document.getElementById('netPositionChart').getContext('2d');
         
-        const exposureData = {
-            labels: ['Manufacturing Plant A', 'Manufacturing Plant B', 'Intercompany Loans', 'Equipment Division', 'Cash & AR', 'Other Operations'],
+        const netPositionData = {
+            labels: ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25'],
             datasets: [{
-                label: 'Unhedged Exposure (USD)',
-                data: [1800000, 950000, 850000, 420000, 320000, 160000],
-                backgroundColor: [
-                    'rgba(239, 68, 68, 0.8)',   // Red - High risk
-                    'rgba(245, 158, 11, 0.8)',  // Orange - Medium risk  
-                    'rgba(16, 185, 129, 0.8)',  // Green - Natural hedge
-                    'rgba(139, 92, 246, 0.8)',  // Purple - Medium risk
-                    'rgba(59, 130, 246, 0.8)',  // Blue - Low risk
-                    'rgba(107, 114, 128, 0.8)'  // Gray - Other
-                ],
-                borderColor: [
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(16, 185, 129, 1)',
-                    'rgba(139, 92, 246, 1)',
-                    'rgba(59, 130, 246, 1)',
-                    'rgba(107, 114, 128, 1)'
-                ],
-                borderWidth: 2
+                label: 'Operational Strategy',
+                data: [-89886, 17096, 3848, 41371, 4028, -19139, -24883, -12338, 4133, 10468, 6250, 1857],
+                backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Balance Sheet Management',  
+                data: [0, 5626, 0, 0, 0, 0, 0, 0, 0, 3533, 0, 0],
+                backgroundColor: 'rgba(155, 89, 182, 0.8)',
+                borderColor: 'rgba(155, 89, 182, 1)',
+                borderWidth: 1
             }]
         };
 
         const config = {
-            type: 'doughnut',
-            data: exposureData,
+            type: 'bar',
+            data: netPositionData,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e0e0e0'
+                        }
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            padding: 20,
-                            font: {
-                                size: 12
-                            }
+                            boxWidth: 12,
+                            padding: 15
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const value = context.parsed;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${context.label}: $${(value/1000000).toFixed(1)}M (${percentage}%)`;
+                                return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
                             }
                         }
-                    }
-                },
-                elements: {
-                    arc: {
-                        borderWidth: 2
                     }
                 }
             }
         };
 
         new Chart(ctx, config);
-
-        // Add some interactive hover effects
-        document.querySelectorAll('.stat-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)';
-            });
-        });
     </script>
 </body>
 </html>
