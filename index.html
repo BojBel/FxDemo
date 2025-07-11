@@ -7,137 +7,195 @@
     <style>
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f9fafb;
+            font-size: 11px;
         }
         .dashboard-container {
             display: flex;
             height: 100vh;
         }
         .control-panel {
-            width: 320px;
+            width: 280px;
             background: white;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
             overflow-y: auto;
         }
         .main-dashboard {
             flex: 1;
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
+            background: white;
         }
         .control-section {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
         .slider {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #e5e7eb;
+            height: 4px;
+            border-radius: 2px;
+            background: #e9ecef;
             outline: none;
-            margin-bottom: 8px;
+            margin: 8px 0;
         }
         
-        /* VaR Report Styling - Excel Look */
+        /* Excel-style VaR Report */
         .var-report {
+            border: 2px solid #000;
             background: white;
-            border: 2px solid #d1d5db;
-            margin-bottom: 20px;
+        }
+        .var-title {
+            background: #4472C4;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 14px;
         }
         .var-header {
-            background: #1e40af;
-            color: white;
-            padding: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .var-content {
-            padding: 20px;
-        }
-        .var-row {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        .var-label {
-            width: 200px;
-            font-weight: 600;
-            color: #374151;
-        }
-        .var-value {
-            font-size: 16px;
-            font-weight: bold;
-            margin-left: 20px;
-        }
-        .var-section {
-            border: 1px solid #d1d5db;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        .var-section-header {
-            background: #f3f4f6;
-            padding: 8px 12px;
-            font-weight: 600;
-            border-bottom: 1px solid #d1d5db;
-        }
-        .var-section-content {
-            padding: 15px;
-        }
-        .var-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 20px 0;
+            border-bottom: 1px solid #000;
         }
-        .var-metric {
-            text-align: center;
+        .header-left, .header-right {
+            padding: 8px;
+            border-right: 1px solid #000;
+        }
+        .header-right {
+            border-right: none;
+        }
+        .header-row {
+            display: grid;
+            grid-template-columns: 120px 100px 120px 100px 80px;
+            border-bottom: 1px solid #ccc;
+            font-size: 10px;
+        }
+        .header-cell {
+            padding: 4px;
+            border-right: 1px solid #ccc;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             padding: 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            background: #fafafa;
         }
-        .var-metric-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-        .var-metric-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        .var-metric-sublabel {
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-        .var-metric-subvalue {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .negative { color: #dc2626; }
-        .positive { color: #16a34a; }
-        .warning { color: #ea580c; }
         
-        .params-table {
+        /* Chart Section */
+        .chart-section {
+            border: 1px solid #ccc;
+        }
+        .chart-title {
+            background: #f2f2f2;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+        .chart-container {
+            height: 300px;
+            padding: 10px;
+            position: relative;
+        }
+        .chart-bar {
+            position: absolute;
+            background: #5B9BD5;
+            border: 1px solid #2F5F8F;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .chart-bar.negative {
+            background: #C55A5A;
+            border-color: #8B3A3A;
+        }
+        .chart-labels {
+            position: absolute;
+            bottom: 5px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            font-size: 8px;
+        }
+        
+        /* Metrics Boxes */
+        .metrics-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .metric-box {
+            border: 2px solid #4472C4;
+            background: white;
+        }
+        .metric-header {
+            background: #4472C4;
+            color: white;
+            text-align: center;
+            padding: 6px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .metric-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .metric-cell {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        .metric-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .metric-label {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        /* Tables */
+        .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin: 10px 0;
+            font-size: 10px;
         }
-        .params-table th,
-        .params-table td {
-            border: 1px solid #d1d5db;
-            padding: 8px;
+        .info-table th {
+            background: #4472C4;
+            color: white;
+            padding: 6px;
+            border: 1px solid #000;
+            font-weight: bold;
+            text-align: center;
+        }
+        .info-table td {
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            text-align: right;
+        }
+        .info-table td:first-child {
             text-align: left;
+            background: #f8f9fa;
         }
-        .params-table th {
-            background: #f9fafb;
-            font-weight: 600;
+        .negative-value {
+            color: #C55A5A;
+        }
+        
+        .bottom-tables {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -145,41 +203,41 @@
     <div class="dashboard-container">
         <!-- Left Control Panel -->
         <div class="control-panel">
-            <h2>FX Risk Controls</h2>
+            <h3>FX Risk Controls</h3>
             
             <div class="control-section">
-                <h3 style="color: #1d4ed8;">Payment Terms</h3>
-                <div style="margin-bottom: 16px;">
-                    <label>AP Payment Days: <span id="ap-days">30</span></label>
+                <h4 style="color: #1d4ed8; margin: 0 0 8px 0;">Payment Terms</h4>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 10px;">AP Payment Days: <span id="ap-days">30</span></label>
                     <input type="range" min="15" max="90" step="5" value="30" class="slider" id="ap-slider">
                 </div>
                 <div>
-                    <label>AR Collection Days: <span id="ar-days">45</span></label>
+                    <label style="font-size: 10px;">AR Collection Days: <span id="ar-days">45</span></label>
                     <input type="range" min="15" max="75" step="5" value="45" class="slider" id="ar-slider">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3 style="color: #059669;">Hedging Strategy</h3>
+                <h4 style="color: #059669; margin: 0 0 8px 0;">Hedging Strategy</h4>
                 <div>
-                    <label>Hedge Ratio: <span id="hedge-ratio">0</span>%</label>
+                    <label style="font-size: 10px;">Hedge Ratio: <span id="hedge-ratio">0</span>%</label>
                     <input type="range" min="0" max="100" step="5" value="0" class="slider" id="hedge-slider">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3 style="color: #7c3aed;">Market Scenarios</h3>
-                <div style="margin-bottom: 16px;">
-                    <label>USD/MXN Rate: <span id="usd-rate">20.0</span></label>
+                <h4 style="color: #7c3aed; margin: 0 0 8px 0;">Market Scenarios</h4>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 10px;">USD/MXN Rate: <span id="usd-rate">20.0</span></label>
                     <input type="range" min="15" max="25" step="0.1" value="20.0" class="slider" id="rate-slider">
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>Volatility: <span id="volatility">19.5</span>%</label>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 10px;">Volatility: <span id="volatility">19.5</span>%</label>
                     <input type="range" min="10" max="35" step="0.5" value="19.5" class="slider" id="vol-slider">
                 </div>
                 <div>
-                    <label>Confidence Level:</label>
-                    <select id="confidence" style="width: 100%; padding: 8px; margin-top: 8px;">
+                    <label style="font-size: 10px;">Confidence Level:</label>
+                    <select id="confidence" style="width: 100%; padding: 4px; margin-top: 4px; font-size: 10px;">
                         <option value="90">90%</option>
                         <option value="95" selected>95%</option>
                         <option value="99">99%</option>
@@ -188,177 +246,202 @@
             </div>
         </div>
 
-        <!-- Main Dashboard - VaR Report Focus -->
+        <!-- Main Dashboard -->
         <div class="main-dashboard">
-            <h1>FX Risk Management Dashboard</h1>
-            
-            <!-- VaR Report Section -->
             <div class="var-report">
+                <!-- Title -->
+                <div class="var-title">FX Management Financial Statement Impact - Mexico</div>
+                
+                <!-- Header Information -->
                 <div class="var-header">
-                    FX Management Financial Statement Impact - Mexico
+                    <div class="header-left">
+                        <div style="margin-bottom: 8px;"><strong>Date:</strong> <span id="current-date"></span></div>
+                        <div style="margin-bottom: 8px;"><strong>Functional Currency:</strong> MXN</div>
+                        <div><strong>Exposure:</strong> USD</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="header-row">
+                            <div class="header-cell"><strong>Transactional Currency</strong></div>
+                            <div class="header-cell"><strong>Functional Currency</strong></div>
+                            <div class="header-cell"><strong>Region</strong></div>
+                        </div>
+                        <div class="header-row">
+                            <div class="header-cell">USD</div>
+                            <div class="header-cell">MXN</div>
+                            <div class="header-cell">Mexico</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="var-content">
-                    <!-- Header Info -->
-                    <div class="var-grid">
-                        <div>
-                            <div class="var-row">
-                                <span class="var-label">Date:</span>
-                                <span class="var-value" id="current-date"></span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Functional Currency:</span>
-                                <span class="var-value">MXN</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Exposure:</span>
-                                <span class="var-value">USD</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="var-row">
-                                <span class="var-label">Transactional Currency:</span>
-                                <span class="var-value">USD</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Functional Currency:</span>
-                                <span class="var-value">MXN</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Region:</span>
-                                <span class="var-value">Mexico</span>
-                            </div>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Chart Section -->
+                    <div class="chart-section">
+                        <div class="chart-title">Net Position M-o-M</div>
+                        <div class="chart-container" id="chart-container">
+                            <!-- Chart bars will be generated by JavaScript -->
                         </div>
                     </div>
 
-                    <!-- Main VaR Metrics -->
-                    <div class="var-grid">
-                        <div class="var-metric">
-                            <div class="var-metric-label">Variable Contribution Margin Exposure</div>
-                            <div class="var-metric-value negative" id="vcm-exposure">-1,704,744</div>
-                            <div class="var-metric-sublabel">P&L Value at Risk</div>
-                            <div class="var-metric-subvalue warning" id="pl-var">157,839</div>
+                    <!-- Metrics Section -->
+                    <div class="metrics-section">
+                        <!-- Variable Contribution Margin -->
+                        <div class="metric-box">
+                            <div class="metric-header">Variable Contribution Margin Exposure</div>
+                            <div class="metric-content">
+                                <div class="metric-cell">
+                                    <div class="metric-value" id="vcm-exposure">141,338</div>
+                                </div>
+                                <div class="metric-cell" style="background: #ffebee;">
+                                    <div class="metric-label">P&L Value at Risk</div>
+                                    <div class="metric-value" style="color: #d32f2f;" id="pl-var">13,086</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="var-metric">
-                            <div class="var-metric-label">Unrealized FX Exposure</div>
-                            <div class="var-metric-value positive" id="fx-exposure">196,889</div>
-                            <div class="var-metric-sublabel">B/S Value at Risk</div>
-                            <div class="var-metric-subvalue positive" id="bs-var">18,230</div>
-                        </div>
-                    </div>
 
-                    <!-- Potential Impact Section -->
-                    <div class="var-section">
-                        <div class="var-section-header">Potential Impact on Financials ($USD 0'000)</div>
-                        <div class="var-section-content">
-                            <div class="var-row">
-                                <span class="var-label">Variable Contribution Margin (Annual Forecast):</span>
-                                <span class="var-value negative" id="vcm-annual">-1,704,744</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Variable Contribution Margin Potential Loss:</span>
-                                <span class="var-value negative" id="vcm-loss">-157,839</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Income/(Loss) from Operations Potential Loss:</span>
-                                <span class="var-value negative" id="ops-loss">-232,788</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Foreign Exchange Losses:</span>
-                                <span class="var-value warning" id="fx-losses">18,230</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">EBITDA:</span>
-                                <span class="var-value warning" id="ebitda-impact">18,230</span>
+                        <!-- Unrealized FX Exposure -->
+                        <div class="metric-box">
+                            <div class="metric-header">Unrealized FX Exposure</div>
+                            <div class="metric-content">
+                                <div class="metric-cell">
+                                    <div class="metric-value" id="fx-exposure">25,197</div>
+                                </div>
+                                <div class="metric-cell" style="background: #e8f5e8;">
+                                    <div class="metric-label">B/S Value at Risk</div>
+                                    <div class="metric-value" style="color: #2e7d32;" id="bs-var">2,333</div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Value at Risk Parameters -->
-                    <div class="var-section">
-                        <div class="var-section-header">Value at Risk</div>
-                        <div class="var-section-content">
-                            <table class="params-table">
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Value</th>
-                                    <th>Description</th>
-                                </tr>
-                                <tr>
-                                    <td>Volatility</td>
-                                    <td id="var-volatility">0.195</td>
-                                    <td>Annual USD/MXN volatility</td>
-                                </tr>
-                                <tr>
-                                    <td>Confidence Interval</td>
-                                    <td id="var-confidence">0.95</td>
-                                    <td>Statistical confidence level</td>
-                                </tr>
-                                <tr>
-                                    <td>Time Horizon</td>
-                                    <td id="var-horizon">0.289</td>
-                                    <td>Monthly risk assessment</td>
-                                </tr>
-                                <tr>
-                                    <td>Z-Score Multiplier</td>
-                                    <td id="var-zscore">1.645</td>
-                                    <td>95% confidence multiplier</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
+                <!-- Potential Impact Table -->
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Potential Impact on Financials ($USD 0'000)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Variable Contribution Margin (Annual Forecast)</td>
+                            <td id="impact-vcm">141,338</td>
+                        </tr>
+                        <tr>
+                            <td>Variable Contribution Margin Potential Loss</td>
+                            <td class="negative-value" id="impact-loss">13,086</td>
+                        </tr>
+                        <tr>
+                            <td>Income/(Loss) from Operations Potential Loss</td>
+                            <td class="negative-value" id="impact-ops">2,892</td>
+                        </tr>
+                        <tr>
+                            <td>Foreign Exchange Losses</td>
+                            <td id="impact-fx">2,333</td>
+                        </tr>
+                        <tr>
+                            <td>EBITDA</td>
+                            <td id="impact-ebitda">2,333</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                    <!-- Operational Strategy Summary -->
-                    <div class="var-section">
-                        <div class="var-section-header">Operational Strategy (Annual)</div>
-                        <div class="var-section-content">
-                            <div class="var-row">
-                                <span class="var-label">Forecasted Long Position:</span>
-                                <span class="var-value positive" id="long-position">630,366</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Forecasted Short Position:</span>
-                                <span class="var-value negative" id="short-position">-2,335,109</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Net P&L Exposures:</span>
-                                <span class="var-value negative" id="net-exposure">-1,704,743</span>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Value at Risk Parameters -->
+                <table class="info-table" style="float: right; width: 300px;">
+                    <thead>
+                        <tr>
+                            <th colspan="3">Value at Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: left;">Volatility</td>
+                            <td id="var-volatility">0.19</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">Confidence Interval</td>
+                            <td id="var-confidence">0.95</td>
+                            <td id="var-multiplier">1.64</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">Time Horizon</td>
+                            <td id="var-horizon">0.29</td>
+                            <td>Monthly</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Bottom Tables -->
+                <div class="bottom-tables">
+                    <!-- Operational Strategy -->
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Operational Strategy (Annual)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Forecasted Long Position</td>
+                                <td id="ops-long">663,681</td>
+                            </tr>
+                            <tr>
+                                <td>Forecasted Short Position</td>
+                                <td class="negative-value" id="ops-short">(522,343)</td>
+                            </tr>
+                            <tr>
+                                <td>SG&A and Others</td>
+                                <td class="negative-value" id="ops-sga">(117,764)</td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>Net P&L Exposures</td>
+                                <td id="ops-net">31,238</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <!-- Balance Sheet Management -->
-                    <div class="var-section">
-                        <div class="var-section-header">Balance Sheet Management (Current Position)</div>
-                        <div class="var-section-content">
-                            <div class="var-row">
-                                <span class="var-label">Current Long Position - B/S:</span>
-                                <span class="var-value positive" id="bs-long">303,743</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">Current Short Position - B/S:</span>
-                                <span class="var-value negative" id="bs-short">-106,854</span>
-                            </div>
-                            <div class="var-row">
-                                <span class="var-label">B/S Net Exposure:</span>
-                                <span class="var-value positive" id="bs-net">196,889</span>
-                            </div>
-                        </div>
-                    </div>
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Balance Sheet Management (Current Position)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Current Long Position - B/S</td>
+                                <td id="bs-long">65,580</td>
+                            </tr>
+                            <tr>
+                                <td>Current Short Position - B/S</td>
+                                <td class="negative-value" id="bs-short">(40,382)</td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>B/S Net Exposure</td>
+                                <td id="bs-net">25,197</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Baseline data
+        // Baseline data matching your Excel values
         const baselineData = {
-            vcmExposure: -1704744,
-            fxExposure: 196889,
-            longPosition: 630366,
-            shortPosition: -2335109,
-            bsLong: 303743,
-            bsShort: -106854
+            monthlyPositions: [2824, -48455, -43255, -30013, 4028, 7668, 1206, 6674, 9830, 11887, 12482, 17271],
+            vcmExposure: 141338,
+            fxExposure: 25197,
+            opsLong: 663681,
+            opsShort: -522343,
+            opsSGA: -117764,
+            bsLong: 65580,
+            bsShort: -40382
         };
+
+        const months = ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25'];
 
         // Control elements
         const apSlider = document.getElementById('ap-slider');
@@ -368,7 +451,47 @@
         const volSlider = document.getElementById('vol-slider');
         const confidenceSelect = document.getElementById('confidence');
 
-        // Update displays
+        function createChart(data) {
+            const container = document.getElementById('chart-container');
+            container.innerHTML = '';
+
+            const maxValue = Math.max(...data.map(Math.abs));
+            const chartHeight = 250;
+            const barWidth = 35;
+            const spacing = 45;
+
+            data.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = `chart-bar ${value < 0 ? 'negative' : ''}`;
+                
+                const height = Math.abs(value) / maxValue * chartHeight * 0.7;
+                const isNegative = value < 0;
+                
+                bar.style.width = `${barWidth}px`;
+                bar.style.height = `${Math.max(height, 20)}px`;
+                bar.style.left = `${index * spacing + 10}px`;
+                bar.style.bottom = isNegative ? `${chartHeight/2 - height}px` : `${chartHeight/2}px`;
+                
+                // Format the value for display
+                const displayValue = Math.abs(value) > 1000 ? 
+                    `${(value/1000).toFixed(0)}` : 
+                    value.toFixed(0);
+                    
+                bar.textContent = displayValue;
+                container.appendChild(bar);
+            });
+
+            // Add month labels
+            const labels = document.createElement('div');
+            labels.className = 'chart-labels';
+            months.forEach(month => {
+                const label = document.createElement('span');
+                label.textContent = month;
+                labels.appendChild(label);
+            });
+            container.appendChild(labels);
+        }
+
         function updateDisplays() {
             document.getElementById('ap-days').textContent = apSlider.value;
             document.getElementById('ar-days').textContent = arSlider.value;
@@ -378,10 +501,9 @@
             document.getElementById('current-date').textContent = new Date().toLocaleDateString();
         }
 
-        // Calculate adjustments
         function calculateAdjustments() {
             const apImpact = (30 - parseInt(apSlider.value)) / 30 * 0.15;
-            const arImpact = (parseInt(arSlider.value) - 45) / 45 * 0.2;
+            const arImpact = (parseInt(arSlider.value) - 45) / 45 * 0.2; // Fixed AR logic
             const hedgeImpact = parseInt(hedgeSlider.value) / 100;
             const rateImpact = (parseFloat(rateSlider.value) - 20.0) / 20.0;
 
@@ -392,20 +514,15 @@
             const timeHorizon = Math.sqrt(1/12);
 
             // Update VaR parameters display
-            document.getElementById('var-volatility').textContent = volatility.toFixed(3);
+            document.getElementById('var-volatility').textContent = volatility.toFixed(2);
             document.getElementById('var-confidence').textContent = (confidence / 100).toFixed(2);
-            document.getElementById('var-horizon').textContent = timeHorizon.toFixed(3);
-            document.getElementById('var-zscore').textContent = confidenceMultiplier.toFixed(3);
+            document.getElementById('var-horizon').textContent = timeHorizon.toFixed(2);
+            document.getElementById('var-multiplier').textContent = confidenceMultiplier.toFixed(2);
 
-            // Calculate adjusted exposures
+            // Calculate adjusted values
             const adjustedVCM = baselineData.vcmExposure * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
             const adjustedFX = baselineData.fxExposure * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
-            const adjustedLong = baselineData.longPosition * (1 + arImpact) * (1 - hedgeImpact);
-            const adjustedShort = baselineData.shortPosition * (1 + apImpact) * (1 - hedgeImpact);
-            const adjustedBSLong = baselineData.bsLong * (1 + arImpact);
-            const adjustedBSShort = baselineData.bsShort * (1 + apImpact);
-
-            // Calculate VaR values
+            
             const plVar = Math.abs(adjustedVCM) * volatility * timeHorizon * confidenceMultiplier;
             const bsVar = Math.abs(adjustedFX) * volatility * timeHorizon * confidenceMultiplier;
 
@@ -415,22 +532,36 @@
             document.getElementById('pl-var').textContent = Math.round(plVar).toLocaleString();
             document.getElementById('bs-var').textContent = Math.round(bsVar).toLocaleString();
 
-            // Update potential impact section
-            document.getElementById('vcm-annual').textContent = Math.round(adjustedVCM).toLocaleString();
-            document.getElementById('vcm-loss').textContent = Math.round(plVar).toLocaleString();
-            document.getElementById('ops-loss').textContent = Math.round(plVar * 1.475).toLocaleString(); // 47.5% higher
-            document.getElementById('fx-losses').textContent = Math.round(bsVar).toLocaleString();
-            document.getElementById('ebitda-impact').textContent = Math.round(bsVar).toLocaleString();
+            // Update impact table
+            document.getElementById('impact-vcm').textContent = Math.round(adjustedVCM).toLocaleString();
+            document.getElementById('impact-loss').textContent = Math.round(plVar).toLocaleString();
+            document.getElementById('impact-ops').textContent = Math.round(plVar * 0.22).toLocaleString();
+            document.getElementById('impact-fx').textContent = Math.round(bsVar).toLocaleString();
+            document.getElementById('impact-ebitda').textContent = Math.round(bsVar).toLocaleString();
 
             // Update operational strategy
-            document.getElementById('long-position').textContent = Math.round(adjustedLong).toLocaleString();
-            document.getElementById('short-position').textContent = Math.round(adjustedShort).toLocaleString();
-            document.getElementById('net-exposure').textContent = Math.round(adjustedLong + adjustedShort).toLocaleString();
+            const adjustedOpsLong = baselineData.opsLong * (1 + arImpact);
+            const adjustedOpsShort = baselineData.opsShort * (1 + apImpact);
+            const adjustedOpsSGA = baselineData.opsSGA * (1 + apImpact + arImpact);
+            
+            document.getElementById('ops-long').textContent = Math.round(adjustedOpsLong).toLocaleString();
+            document.getElementById('ops-short').textContent = `(${Math.abs(Math.round(adjustedOpsShort)).toLocaleString()})`;
+            document.getElementById('ops-sga').textContent = `(${Math.abs(Math.round(adjustedOpsSGA)).toLocaleString()})`;
+            document.getElementById('ops-net').textContent = Math.round(adjustedOpsLong + adjustedOpsShort + adjustedOpsSGA).toLocaleString();
 
             // Update balance sheet
+            const adjustedBSLong = baselineData.bsLong * (1 + arImpact);
+            const adjustedBSShort = baselineData.bsShort * (1 + apImpact);
+            
             document.getElementById('bs-long').textContent = Math.round(adjustedBSLong).toLocaleString();
-            document.getElementById('bs-short').textContent = Math.round(adjustedBSShort).toLocaleString();
+            document.getElementById('bs-short').textContent = `(${Math.abs(Math.round(adjustedBSShort)).toLocaleString()})`;
             document.getElementById('bs-net').textContent = Math.round(adjustedBSLong + adjustedBSShort).toLocaleString();
+
+            // Update chart with adjusted monthly positions
+            const adjustedMonthly = baselineData.monthlyPositions.map(pos => 
+                pos * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+            );
+            createChart(adjustedMonthly);
         }
 
         // Event listeners
@@ -441,9 +572,7 @@
             });
         });
 
-        confidenceSelect.addEventListener('change', () => {
-            calculateAdjustments();
-        });
+        confidenceSelect.addEventListener('change', calculateAdjustments);
 
         // Initialize
         updateDisplays();
