@@ -1,1 +1,547 @@
+import React, { useState, useEffect } from 'react';
 
+const FXRiskDashboard = () => {
+  // Baseline data from the Excel file
+  const baselineData = {
+    operationalStrategy: {
+      contractualSales: [35225, 3378, 5304, 2517, 2482, 2693, 2693, 2693, 2693, 2693, 2693, 2693, 2693],
+      icSales: [618455, 67891, 63857, 71648, 75454, 51738, 53601, 48031, 35015, 39632, 42662, 35488, 33438],
+      forecastedPurchases: [-522343, -62086, -55911, -59751, -45981, -44855, -41355, -35296, -35412, -35122, -36711, -35919, -33944],
+      variableContributionMargin: [-1704743.78, -134787.43, -149519.93, -149133.12, -83022.45, -129761.28, -142961.94, -153345.15, -160063.55, -153573.87, -152321.92, -150708.57, -145544.58]
+    },
+    
+    balanceSheetData: {
+      cashEquivalents: [12808, 1141, 1239, 1050, 1064, 1001, 1001, 1252, 1395, 978, 934, 1550, 2493],
+      arIC: [49772, 23533, 17478, 17825, 18656, 14079, 15536, 12713, 9546, 9835, 10500, 9198, 8527],
+      longPosition: [65580, 64910, 29160, 32024, 35337, 33453, 37603, 37474, 36999, 39982, 43339, 44730, 46752],
+      apThirdParty: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
+      shortPosition: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
+      fxLossesPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271],
+      ebitdaPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271]
+    },
+    
+    months: ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25']
+  };
+
+  // Control states (using simple values, not arrays)
+  const [apPaymentDays, setApPaymentDays] = useState(30);
+  const [arCollectionDays, setArCollectionDays] = useState(45);
+  const [hedgeRatio, setHedgeRatio] = useState(0);
+  const [usdMxnRate, setUsdMxnRate] = useState(20.0);
+  const [volatility, setVolatility] = useState(19.5);
+  const [confidenceLevel, setConfidenceLevel] = useState('95');
+
+  // Adjusted values based on controls
+  const [adjustedData, setAdjustedData] = useState(baselineData);
+
+  // Calculate adjustments based on control changes
+  useEffect(() => {
+    const calculateAdjustments = () => {
+      const apImpact = (30 - apPaymentDays) / 30 * 0.15;
+      const arImpact = (45 - arCollectionDays) / 45 * 0.2;
+      const hedgeImpact = hedgeRatio / 100;
+      const rateImpact = (usdMxnRate - 20.0) / 20.0;
+
+      // Adjust all the data arrays
+      const newData = { ...baselineData };
+      
+      // Adjust operational strategy
+      newData.operationalStrategy = {
+        ...baselineData.operationalStrategy,
+        variableContributionMargin: baselineData.operationalStrategy.variableContributionMargin.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        )
+      };
+
+      // Adjust balance sheet data
+      newData.balanceSheetData = {
+        ...baselineData.balanceSheetData,
+        fxLossesPosition: baselineData.balanceSheetData.fxLossesPosition.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        ),
+        ebitdaPosition: baselineData.balanceSheetData.ebitdaPosition.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        )
+      };
+
+      setAdjustedData(newData);
+    };
+
+    calculateAdjustments();
+  }, [apPaymentDays, arCollectionDays, hedgeRatio, usdMxnRate, volatility, confidenceLevel]);
+
+  // Format numbers for display
+  const formatNumber = (num) => {
+    if (num === undefined || num === null || isNaN(num)) {
+      return '0';
+    }
+    
+    const numValue = Number(num);
+    return numValue.toLocaleString('en-US', { 
+      minimumFractionDigits: 0, 
+      maximumFractionDigits: 0 
+    });
+  };
+
+  // VaR Report section
+  const VaRReportSection = () => {
+    const varParams = {
+      volatility: volatility / 100,
+      confidenceInterval: parseInt(confidenceLevel) / 100,
+      timeHorizon: Math.sqrt(1/12)
+    };
+
+    const confidenceMultiplier = confidenceLevel === '95' ? 1.645 : confidenceLevel === '99' ? 2.326 : 1.282;
+    const variableContributionExposure = adjustedData.operationalStrategy.variableContributionMargin[0];
+    const plValueAtRisk = Math.abs(variableContributionExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
+    
+    const unrealizedFXExposure = adjustedData.balanceSheetData.fxLossesPosition[0];
+    const bsValueAtRisk = Math.abs(unrealizedFXExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
+
+    return (
+      <div style={{ backgroundColor: '#eff6ff', padding: '24px', borderRadius: '8px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e3a8a', marginBottom: '16px' }}>
+          FX Management Financial Statement Impact - Mexico
+        </h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db' }}>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Date: {new Date().toLocaleDateString()}</div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Functional Currency: MXN</div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>Exposure: USD</div>
+          </div>
+          
+          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db' }}>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Transactional Currency: USD</div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Functional Currency: MXN</div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>Region: Mexico</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px' }}>
+          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', textAlign: 'center' }}>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Variable Contribution Margin Exposure</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#dc2626' }}>{formatNumber(variableContributionExposure)}</div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>P&L Value at Risk</div>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ea580c' }}>{formatNumber(plValueAtRisk)}</div>
+          </div>
+
+          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', textAlign: 'center' }}>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Unrealized FX Exposure</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb' }}>{formatNumber(unrealizedFXExposure)}</div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>B/S Value at Risk</div>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#16a34a' }}>{formatNumber(bsValueAtRisk)}</div>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', marginTop: '24px' }}>
+          <h4 style={{ fontWeight: 'bold', color: '#374151', marginBottom: '12px' }}>Value at Risk Parameters</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', fontSize: '14px' }}>
+            <div>
+              <span style={{ color: '#6b7280' }}>Volatility:</span>
+              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{(volatility / 100).toFixed(3)}</span>
+            </div>
+            <div>
+              <span style={{ color: '#6b7280' }}>Confidence Interval:</span>
+              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{(parseInt(confidenceLevel) / 100).toFixed(2)}</span>
+            </div>
+            <div>
+              <span style={{ color: '#6b7280' }}>Time Horizon:</span>
+              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{varParams.timeHorizon.toFixed(3)} (Monthly)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Excel-style table component
+  const ExcelTable = ({ title, data, backgroundColor = "#f9fafb" }) => (
+    <div style={{ marginBottom: '24px' }}>
+      <div style={{ backgroundColor, padding: '12px', borderBottom: '2px solid #d1d5db' }}>
+        <h3 style={{ fontWeight: 'bold', color: '#374151', margin: 0 }}>{title}</h3>
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#f3f4f6' }}>
+              <th style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'left', fontWeight: '600' }}>Item</th>
+              <th style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right', fontWeight: '600' }}>12mo Forecast</th>
+              {baselineData.months.map(month => (
+                <th key={month} style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right', fontWeight: '600' }}>{month}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? "white" : "#f9fafb" }}>
+                <td style={{ border: '1px solid #d1d5db', padding: '8px', fontWeight: '500' }}>{row.label}</td>
+                <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right' }}>{formatNumber(row.annual)}</td>
+                {row.monthly.map((value, monthIndex) => (
+                  <td key={monthIndex} style={{ 
+                    border: '1px solid #d1d5db', 
+                    padding: '8px', 
+                    textAlign: 'right',
+                    color: value < 0 ? '#dc2626' : '#000000'
+                  }}>
+                    {formatNumber(value)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#f9fafb' }}>
+      {/* Left Control Panel */}
+      <div style={{ 
+        width: '320px', 
+        backgroundColor: 'white', 
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
+        padding: '24px', 
+        overflowY: 'auto' 
+      }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '24px' }}>
+          FX Risk Controls
+        </h2>
+        
+        {/* Payment Terms Section */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid #e5e7eb', 
+          borderRadius: '8px', 
+          padding: '16px', 
+          marginBottom: '16px' 
+        }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#1d4ed8', marginBottom: '12px' }}>
+            Payment Terms
+          </h3>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              AP Payment Days: {apPaymentDays}
+            </label>
+            <input
+              type="range"
+              min="15"
+              max="90"
+              step="5"
+              value={apPaymentDays}
+              onChange={(e) => setApPaymentDays(parseInt(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                background: '#e5e7eb',
+                outline: 'none',
+                marginBottom: '8px'
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '10px', 
+              color: '#9ca3af' 
+            }}>
+              <span>15</span>
+              <span>90</span>
+            </div>
+          </div>
+          
+          <div>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              AR Collection Days: {arCollectionDays}
+            </label>
+            <input
+              type="range"
+              min="15"
+              max="75"
+              step="5"
+              value={arCollectionDays}
+              onChange={(e) => setArCollectionDays(parseInt(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                background: '#e5e7eb',
+                outline: 'none',
+                marginBottom: '8px'
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '10px', 
+              color: '#9ca3af' 
+            }}>
+              <span>15</span>
+              <span>75</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hedging Strategy Section */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid #e5e7eb', 
+          borderRadius: '8px', 
+          padding: '16px', 
+          marginBottom: '16px' 
+        }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#059669', marginBottom: '12px' }}>
+            Hedging Strategy
+          </h3>
+          <div>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              Hedge Ratio: {hedgeRatio}%
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={hedgeRatio}
+              onChange={(e) => setHedgeRatio(parseInt(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                background: '#e5e7eb',
+                outline: 'none',
+                marginBottom: '8px'
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '10px', 
+              color: '#9ca3af' 
+            }}>
+              <span>0%</span>
+              <span>100%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Market Scenarios Section */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid #e5e7eb', 
+          borderRadius: '8px', 
+          padding: '16px', 
+          marginBottom: '16px' 
+        }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#7c3aed', marginBottom: '12px' }}>
+            Market Scenarios
+          </h3>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              USD/MXN Rate: {usdMxnRate.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="15"
+              max="25"
+              step="0.1"
+              value={usdMxnRate}
+              onChange={(e) => setUsdMxnRate(parseFloat(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                background: '#e5e7eb',
+                outline: 'none',
+                marginBottom: '8px'
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '10px', 
+              color: '#9ca3af' 
+            }}>
+              <span>15.0</span>
+              <span>25.0</span>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              Volatility: {volatility}%
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="35"
+              step="0.5"
+              value={volatility}
+              onChange={(e) => setVolatility(parseFloat(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                background: '#e5e7eb',
+                outline: 'none',
+                marginBottom: '8px'
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '10px', 
+              color: '#9ca3af' 
+            }}>
+              <span>10%</span>
+              <span>35%</span>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ 
+              fontSize: '12px', 
+              fontWeight: '500', 
+              color: '#6b7280', 
+              display: 'block', 
+              marginBottom: '8px' 
+            }}>
+              Confidence Level
+            </label>
+            <select
+              value={confidenceLevel}
+              onChange={(e) => setConfidenceLevel(e.target.value)}
+              style={{ 
+                width: '100%', 
+                padding: '8px', 
+                border: '1px solid #d1d5db', 
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="90">90%</option>
+              <option value="95">95%</option>
+              <option value="99">99%</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Dashboard - Excel Style */}
+      <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#374151', marginBottom: '24px' }}>
+          FX Risk Management Dashboard
+        </h1>
+        
+        {/* VaR Report Section */}
+        <VaRReportSection />
+
+        {/* Operational Strategy */}
+        <ExcelTable 
+          title="Operational Strategy"
+          backgroundColor="#eff6ff"
+          data={[
+            {
+              label: "Contractual Sales",
+              annual: adjustedData.operationalStrategy.contractualSales[0],
+              monthly: adjustedData.operationalStrategy.contractualSales.slice(1)
+            },
+            {
+              label: "IC Sales", 
+              annual: adjustedData.operationalStrategy.icSales[0],
+              monthly: adjustedData.operationalStrategy.icSales.slice(1)
+            },
+            {
+              label: "Forecasted Purchases",
+              annual: adjustedData.operationalStrategy.forecastedPurchases[0],
+              monthly: adjustedData.operationalStrategy.forecastedPurchases.slice(1)
+            },
+            {
+              label: "Position Exposed on Variable Contribution Margin",
+              annual: adjustedData.operationalStrategy.variableContributionMargin[0],
+              monthly: adjustedData.operationalStrategy.variableContributionMargin.slice(1)
+            }
+          ]}
+        />
+
+        {/* Balance Sheet Management */}
+        <ExcelTable 
+          title="Balance Sheet Management"
+          backgroundColor="#f0fdf4"
+          data={[
+            {
+              label: "Cash & cash equivalents",
+              annual: adjustedData.balanceSheetData.cashEquivalents[0],
+              monthly: adjustedData.balanceSheetData.cashEquivalents.slice(1)
+            },
+            {
+              label: "AR - IC",
+              annual: adjustedData.balanceSheetData.arIC[0],
+              monthly: adjustedData.balanceSheetData.arIC.slice(1)
+            },
+            {
+              label: "Long Position",
+              annual: adjustedData.balanceSheetData.longPosition[0],
+              monthly: adjustedData.balanceSheetData.longPosition.slice(1)
+            },
+            {
+              label: "AP - 3rd Party",
+              annual: adjustedData.balanceSheetData.apThirdParty[0],
+              monthly: adjustedData.balanceSheetData.apThirdParty.slice(1)
+            },
+            {
+              label: "Short Position",
+              annual: adjustedData.balanceSheetData.shortPosition[0],
+              monthly: adjustedData.balanceSheetData.shortPosition.slice(1)
+            },
+            {
+              label: "Position to impact Foreign Exchange Losses",
+              annual: adjustedData.balanceSheetData.fxLossesPosition[0],
+              monthly: adjustedData.balanceSheetData.fxLossesPosition.slice(1)
+            },
+            {
+              label: "Position Exposed on EBTDA",
+              annual: adjustedData.balanceSheetData.ebitdaPosition[0],
+              monthly: adjustedData.balanceSheetData.ebitdaPosition.slice(1)
+            }
+          ]}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default FXRiskDashboard;
