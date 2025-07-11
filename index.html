@@ -1,672 +1,409 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FX Management Financial Statement Impact</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-            color: #333;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px 30px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .interactive-controls {
-            background: #34495e;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .scenario-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: white;
-        }
-        
-        .scenario-button {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .scenario-button:hover {
-            background: #c0392b;
-            transform: scale(1.05);
-        }
-        
-        .scenario-button.active {
-            background: #27ae60;
-        }
-        
-        .entity-toggles {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .entity-toggle {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: white;
-            font-size: 0.9rem;
-        }
-        
-        .entity-toggle input[type="checkbox"] {
-            transform: scale(1.2);
-        }
-        
-        .date-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 30px;
-            background: #ecf0f1;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .date-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .date-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .date-value {
-            font-weight: bold;
-            padding: 5px 15px;
-            border: 2px solid #333;
-            background: white;
-        }
-        
-        .currency-info {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .currency-item {
-            text-align: center;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 30px;
-        }
-        
-        .chart-section {
-            background: #fafafa;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-        
-        .metrics-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .metric-box {
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .metric-header {
-            background: #34495e;
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        
-        .metric-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-        
-        .metric-item {
-            padding: 15px;
-            text-align: center;
-            border-right: 1px solid #ddd;
-        }
-        
-        .metric-item:last-child {
-            border-right: none;
-        }
-        
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .metric-label {
-            font-size: 0.8rem;
-            color: #666;
-        }
-        
-        .positive { color: #27ae60; }
-        .negative { color: #e74c3c; }
-        
-        .scenario-impact {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .scenario-impact.positive {
-            background: #d4edda;
-            border-color: #c3e6cb;
-        }
-        
-        .scenario-impact.negative {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-        }
-        
-        .tables-section {
-            grid-column: 1 / -1;
-            margin-top: 20px;
-        }
-        
-        .tables-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        
-        .table-container {
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .table-title {
-            background: #34495e;
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th {
-            background: #ecf0f1;
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.9rem;
-        }
-        
-        .data-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: right;
-        }
-        
-        .data-table td:first-child {
-            text-align: left;
-        }
-        
-        .var-section {
-            grid-column: 1 / -1;
-            margin-top: 20px;
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .var-header {
-            background: #34495e;
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .var-content {
-            padding: 20px;
-        }
-        
-        .var-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .var-item {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-            background: white;
-        }
-        
-        .confidence-value {
-            background: #d5f4e6;
-            font-weight: bold;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content { grid-template-columns: 1fr; }
-            .tables-grid { grid-template-columns: 1fr; }
-            .date-info { flex-direction: column; gap: 15px; }
-            .interactive-controls { flex-direction: column; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>FX Management Financial Statement Impact - Mexico</h1>
-        </div>
-        
-        <div class="interactive-controls">
-            <div class="scenario-section">
-                <label style="color: white; font-weight: bold;">What-If Analysis:</label>
-                <button class="scenario-button active" onclick="applyScenario(0)">Current</button>
-                <button class="scenario-button" onclick="applyScenario(5)">Peso +5%</button>
-                <button class="scenario-button" onclick="applyScenario(-5)">Peso -5%</button>
-                <button class="scenario-button" onclick="applyScenario(10)">Peso +10%</button>
-            </div>
-            
-            <div class="entity-toggles">
-                <label style="color: white; font-weight: bold;">Show/Hide:</label>
-                <div class="entity-toggle">
-                    <input type="checkbox" id="opStrategy" checked onchange="toggleEntity('opStrategy')">
-                    <label for="opStrategy">Operations</label>
-                </div>
-                <div class="entity-toggle">
-                    <input type="checkbox" id="bsManagement" checked onchange="toggleEntity('bsManagement')">
-                    <label for="bsManagement">Balance Sheet</label>
-                </div>
-            </div>
-        </div>
-        
-        <div class="date-info">
-            <div class="date-section">
-                <div class="date-label">Date</div>
-                <div class="date-value">5/1/25</div>
-            </div>
-            <div class="date-section">
-                <div class="date-label">Functional Currency</div>
-                <div class="date-value">MXN</div>
-            </div>
-            <div class="date-section">
-                <div class="date-label">Exposure</div>
-                <div class="date-value">USD</div>
-            </div>
-            
-            <div class="currency-info">
-                <div class="currency-item">
-                    <div class="date-label">Transactional Currency</div>
-                    <div class="date-value">USD</div>
-                </div>
-                <div class="currency-item">
-                    <div class="date-label">Functional Currency</div>
-                    <div class="date-value">MXN</div>
-                </div>
-                <div class="currency-item">
-                    <div class="date-label">Region</div>
-                    <div class="date-value">Mexico</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="main-content">
-            <div class="chart-section">
-                <div class="chart-title">Net Position M-o-M</div>
-                <div class="chart-container">
-                    <canvas id="netPositionChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="metrics-section">
-                <div class="metric-box">
-                    <div class="metric-header">Variable Contribution Margin Exposure</div>
-                    <div class="metric-content">
-                        <div class="metric-item">
-                            <div class="metric-value" id="marginExposure">131,338</div>
-                            <div class="metric-label"></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value negative" id="marginVaR">12,160</div>
-                            <div class="metric-label">P&L Value at Risk</div>
-                        </div>
-                    </div>
-                    <div class="scenario-impact" id="marginImpact" style="display: none;"></div>
-                </div>
-                
-                <div class="metric-box">
-                    <div class="metric-header">Unrealized FX Exposure</div>
-                    <div class="metric-content">
-                        <div class="metric-item">
-                            <div class="metric-value" id="fxExposure">197,500</div>
-                            <div class="metric-label"></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value negative" id="fxVaR">18,286</div>
-                            <div class="metric-label">B/S Value at Risk</div>
-                        </div>
-                    </div>
-                    <div class="scenario-impact" id="fxImpact" style="display: none;"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="tables-section">
-            <div class="tables-grid">
-                <div class="table-container">
-                    <div class="table-title">Operational Strategy (Annual)</div>
-                    <table class="data-table">
-                        <tbody>
-                            <tr>
-                                <td>Forecasted Long Position</td>
-                                <td id="longPosition">653,681</td>
-                            </tr>
-                            <tr>
-                                <td>Forecasted Short Position</td>
-                                <td id="shortPosition">(522,343)</td>
-                            </tr>
-                            <tr>
-                                <td>SG&A and Others</td>
-                                <td id="sgaOthers">(117,764)</td>
-                            </tr>
-                            <tr style="border-top: 2px solid #333;">
-                                <td><strong>Net P&L Exposures</strong></td>
-                                <td><strong id="netPL">21,238</strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="table-container">
-                    <div class="table-title">Potential Impact on Financials ($USD 0'000)</div>
-                    <table class="data-table">
-                        <tbody>
-                            <tr>
-                                <td>Variable Contribution Margin (Annual Forecast)</td>
-                                <td id="annualMargin">131,338</td>
-                            </tr>
-                            <tr>
-                                <td>Variable Contribution Margin Potential Loss</td>
-                                <td id="marginLoss">12,160</td>
-                            </tr>
-                            <tr>
-                                <td>Income/(Loss) from Operations Potential Loss</td>
-                                <td id="opLoss">1,966</td>
-                            </tr>
-                            <tr>
-                                <td>Foreign Exchange Losses</td>
-                                <td id="fxLoss">18,286</td>
-                            </tr>
-                            <tr>
-                                <td>EBTDA</td>
-                                <td id="ebtda">18,286</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="table-container" style="margin-top: 20px;">
-                <div class="table-title">Balance Sheet Management (Current Position)</div>
-                <table class="data-table">
-                    <tbody>
-                        <tr>
-                            <td>Current Long Position - B/S</td>
-                            <td id="currentLong">291,354</td>
-                        </tr>
-                        <tr>
-                            <td>Current Short Position - B/S</td>
-                            <td id="currentShort">(93,854)</td>
-                        </tr>
-                        <tr style="border-top: 2px solid #333;">
-                            <td><strong>B/S Net Exposure</strong></td>
-                            <td><strong id="bsNetExposure">197,500</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="var-section">
-            <div class="var-header">Value at Risk</div>
-            <div class="var-content">
-                <div class="var-grid">
-                    <div class="var-item"><strong>Volatility</strong></div>
-                    <div class="var-item"><strong>0.19</strong></div>
-                    <div class="var-item"></div>
-                    
-                    <div class="var-item"><strong>Confidence Interval</strong></div>
-                    <div class="var-item confidence-value">0.95</div>
-                    <div class="var-item confidence-value">1.64</div>
-                    
-                    <div class="var-item"><strong>Time Horizon</strong></div>
-                    <div class="var-item"><strong>0.29</strong></div>
-                    <div class="var-item"><strong>Monthly</strong></div>
-                </div>
-            </div>
-        </div>
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const FXRiskDashboard = () => {
+  // Baseline data from the Excel file
+  const baselineData = {
+    monthlyFXExposure: [-244913.1383559679, -582492.5397071253, -595985.0428778412, -246269.09751139852, -227072.9735906436, -287223.4118427991, -310807.28302577627, -327908.8959023253, -328137.6167722435, -320395.9865059182, -317530.68876220554, -310753.34235342825],
+    monthlyPLExposure: [-134787.43164596788, -149519.92506115738, -149133.11681668373, -83022.44969471474, -129761.2768115427, -142961.93886248406, -153345.14799451985, -160063.55173903308, -153573.86886443806, -152321.9214727078, -150708.5711207253, -145544.57506393053],
+    months: ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25'],
+    
+    // Excel dashboard data structure
+    operationalStrategy: {
+      contractualSales: [35225, 3378, 5304, 2517, 2482, 2693, 2693, 2693, 2693, 2693, 2693, 2693, 2693],
+      icSales: [618455, 67891, 63857, 71648, 75454, 51738, 53601, 48031, 35015, 39632, 42662, 35488, 33438],
+      forecastedPurchases: [-522343, -62086, -55911, -59751, -45981, -44855, -41355, -35296, -35412, -35122, -36711, -35919, -33944],
+      variableContributionMargin: [-1704743.78, -134787.43, -149519.93, -149133.12, -83022.45, -129761.28, -142961.94, -153345.15, -160063.55, -153573.87, -152321.92, -150708.57, -145544.58]
+    },
+    
+    balanceSheetData: {
+      cashEquivalents: [12808, 1141, 1239, 1050, 1064, 1001, 1001, 1252, 1395, 978, 934, 1550, 2493],
+      arIC: [49772, 23533, 17478, 17825, 18656, 14079, 15536, 12713, 9546, 9835, 10500, 9198, 8527],
+      longPosition: [65580, 64910, 29160, 32024, 35337, 33453, 37603, 37474, 36999, 39982, 43339, 44730, 46752],
+      apThirdParty: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
+      shortPosition: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
+      fxLossesPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271],
+      ebitdaPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271]
+    }
+  };
+
+  // Control states
+  const [apPaymentDays, setApPaymentDays] = useState([30]);
+  const [arCollectionDays, setArCollectionDays] = useState([45]);
+  const [hedgeRatio, setHedgeRatio] = useState([0]);
+  const [usdMxnRate, setUsdMxnRate] = useState([20.0]);
+  const [volatility, setVolatility] = useState([19.5]);
+  const [confidenceLevel, setConfidenceLevel] = useState(['95']);
+
+  // Adjusted values based on controls
+  const [adjustedData, setAdjustedData] = useState(baselineData);
+
+  // Calculate adjustments based on control changes
+  useEffect(() => {
+    const calculateAdjustments = () => {
+      const apImpact = (30 - apPaymentDays[0]) / 30 * 0.15;
+      const arImpact = (45 - arCollectionDays[0]) / 45 * 0.2;
+      const hedgeImpact = hedgeRatio[0] / 100;
+      const rateImpact = (usdMxnRate[0] - 20.0) / 20.0;
+
+      // Adjust all the data arrays
+      const newData = { ...baselineData };
+      
+      // Adjust operational strategy
+      newData.operationalStrategy = {
+        ...baselineData.operationalStrategy,
+        variableContributionMargin: baselineData.operationalStrategy.variableContributionMargin.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        )
+      };
+
+      // Adjust balance sheet data
+      newData.balanceSheetData = {
+        ...baselineData.balanceSheetData,
+        fxLossesPosition: baselineData.balanceSheetData.fxLossesPosition.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        ),
+        ebitdaPosition: baselineData.balanceSheetData.ebitdaPosition.map(val => 
+          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
+        )
+      };
+
+      setAdjustedData(newData);
+    };
+
+    calculateAdjustments();
+  }, [apPaymentDays, arCollectionDays, hedgeRatio, usdMxnRate, volatility, confidenceLevel]);
+
+  // Format numbers for display
+  const formatNumber = (num, showSign = false) => {
+    if (num === undefined || num === null || isNaN(num)) {
+      return '0';
+    }
+    
+    const numValue = Number(num);
+    const formatted = numValue.toLocaleString('en-US', { 
+      minimumFractionDigits: 0, 
+      maximumFractionDigits: 0 
+    });
+    
+    if (showSign && numValue > 0) {
+      return `+${formatted}`;
+    }
+    return formatted;
+  };
+
+  // Excel-style table component
+  const ExcelTable = ({ title, data, headers, backgroundColor = "bg-gray-50" }) => (
+    <div className="mb-6">
+      <div className={`${backgroundColor} p-3 border-b-2 border-gray-300`}>
+        <h3 className="font-bold text-gray-800">{title}</h3>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-300 p-2 text-left font-semibold">Item</th>
+              <th className="border border-gray-300 p-2 text-right font-semibold">12mo Forecast</th>
+              {baselineData.months.map(month => (
+                <th key={month} className="border border-gray-300 p-2 text-right font-semibold">{month}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <td className="border border-gray-300 p-2 font-medium">{row.label}</td>
+                <td className="border border-gray-300 p-2 text-right">{formatNumber(row.annual)}</td>
+                {row.monthly.map((value, monthIndex) => (
+                  <td key={monthIndex} className={`border border-gray-300 p-2 text-right ${value < 0 ? 'text-red-600' : ''}`}>
+                    {formatNumber(value)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
+  );
 
-    <script>
-        // Global variables
-        let netPositionChart;
-        const baseData = {
-            marginExposure: 131338,
-            marginVaR: 12160,
-            fxExposure: 197500,
-            fxVaR: 18286,
-            longPosition: 653681,
-            shortPosition: -522343,
-            sgaOthers: -117764,
-            netPL: 21238,
-            annualMargin: 131338,
-            marginLoss: 12160,
-            opLoss: 1966,
-            fxLoss: 18286,
-            ebtda: 18286,
-            currentLong: 291354,
-            currentShort: -93854,
-            bsNetExposure: 197500
-        };
+  // VaR Report section (matching your Excel format)
+  const VaRReportSection = () => {
+    const varParams = {
+      volatility: volatility[0] / 100,
+      confidenceInterval: parseInt(confidenceLevel[0]) / 100,
+      timeHorizon: Math.sqrt(1/12)
+    };
+
+    const confidenceMultiplier = confidenceLevel[0] === '95' ? 1.645 : confidenceLevel[0] === '99' ? 2.326 : 1.282;
+    const variableContributionExposure = adjustedData.operationalStrategy.variableContributionMargin[0]; // Annual
+    const plValueAtRisk = Math.abs(variableContributionExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
+    
+    const unrealizedFXExposure = adjustedData.balanceSheetData.fxLossesPosition[0];
+    const bsValueAtRisk = Math.abs(unrealizedFXExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
+
+    return (
+      <div className="bg-blue-50 p-6 rounded-lg mb-6">
+        <h2 className="text-xl font-bold text-blue-900 mb-4">FX Management Financial Statement Impact - Mexico</h2>
         
-        // Chart data
-        const chartData = {
-            labels: ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25'],
-            datasets: [{
-                label: 'Operational Strategy',
-                data: [-89886, 17096, 3848, 41371, 4028, -19139, -24883, -12338, 4133, 10468, 6250, 1857],
-                backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                borderColor: 'rgba(52, 152, 219, 1)',
-                borderWidth: 1
-            }, {
-                label: 'Balance Sheet Management',  
-                data: [0, 5626, 0, 0, 0, 0, 0, 0, 0, 3533, 0, 0],
-                backgroundColor: 'rgba(155, 89, 182, 0.8)',
-                borderColor: 'rgba(155, 89, 182, 1)',
-                borderWidth: 1
-            }]
-        };
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div className="bg-white p-4 rounded border">
+              <div className="text-sm text-gray-600 mb-2">Date: {new Date().toLocaleDateString()}</div>
+              <div className="text-sm text-gray-600 mb-2">Functional Currency: MXN</div>
+              <div className="text-sm text-gray-600">Exposure: USD</div>
+            </div>
+          </div>
+          
+          <div>
+            <div className="bg-white p-4 rounded border">
+              <div className="text-sm text-gray-600 mb-2">Transactional Currency: USD</div>
+              <div className="text-sm text-gray-600 mb-2">Functional Currency: MXN</div>
+              <div className="text-sm text-gray-600">Region: Mexico</div>
+            </div>
+          </div>
+        </div>
 
-        // Initialize chart
-        function initChart() {
-            const ctx = document.getElementById('netPositionChart').getContext('2d');
-            
-            const config = {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e0e0e0'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white p-4 rounded border">
+            <div className="text-center">
+              <div className="text-sm text-gray-600 mb-2">Variable Contribution Margin Exposure</div>
+              <div className="text-2xl font-bold text-red-600">{formatNumber(variableContributionExposure)}</div>
+              <div className="text-sm text-gray-600 mt-2">P&L Value at Risk</div>
+              <div className="text-xl font-bold text-orange-600">{formatNumber(plValueAtRisk)}</div>
+            </div>
+          </div>
 
-            netPositionChart = new Chart(ctx, config);
-        }
+          <div className="bg-white p-4 rounded border">
+            <div className="text-center">
+              <div className="text-sm text-gray-600 mb-2">Unrealized FX Exposure</div>
+              <div className="text-2xl font-bold text-blue-600">{formatNumber(unrealizedFXExposure)}</div>
+              <div className="text-sm text-gray-600 mt-2">B/S Value at Risk</div>
+              <div className="text-xl font-bold text-green-600">{formatNumber(bsValueAtRisk)}</div>
+            </div>
+          </div>
+        </div>
 
-        // Apply scenario analysis
-        function applyScenario(changePercent) {
-            // Update button states
-            document.querySelectorAll('.scenario-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+        <div className="bg-white p-4 rounded border mt-6">
+          <h4 className="font-bold text-gray-800 mb-3">Value at Risk Parameters</h4>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="text-gray-600">Volatility:</span>
+              <span className="ml-2 font-semibold">{(volatility[0] / 100).toFixed(3)}</span>
+            </div>
+            <div>
+              <span className="text-gray-600">Confidence Interval:</span>
+              <span className="ml-2 font-semibold">{(parseInt(confidenceLevel[0]) / 100).toFixed(2)}</span>
+            </div>
+            <div>
+              <span className="text-gray-600">Time Horizon:</span>
+              <span className="ml-2 font-semibold">{varParams.timeHorizon.toFixed(3)} (Monthly)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Left Control Panel */}
+      <div className="w-80 bg-white shadow-lg p-6 overflow-y-auto">
+        <h2 className="text-xl font-bold text-gray-800 mb-6">FX Risk Controls</h2>
+        
+        {/* Payment Terms Section */}
+        <Card className="mb-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-blue-700">Payment Terms</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                AP Payment Days: {apPaymentDays[0]}
+              </label>
+              <Slider
+                value={apPaymentDays}
+                onValueChange={setApPaymentDays}
+                max={90}
+                min={15}
+                step={5}
+                className="w-full"
+              />
+            </div>
             
-            // Calculate impact
-            const impactMultiplier = changePercent / 100;
-            
-            // Update metrics
-            const marginImpact = Math.round(baseData.marginExposure * impactMultiplier);
-            const fxImpact = Math.round(baseData.fxExposure * impactMultiplier);
-            
-            // Update display
-            document.getElementById('marginExposure').textContent = (baseData.marginExposure + marginImpact).toLocaleString();
-            document.getElementById('fxExposure').textContent = (baseData.fxExposure + fxImpact).toLocaleString();
-            
-            // Show/hide impact messages
-            const marginImpactEl = document.getElementById('marginImpact');
-            const fxImpactEl = document.getElementById('fxImpact');
-            
-            if (changePercent === 0) {
-                marginImpactEl.style.display = 'none';
-                fxImpactEl.style.display = 'none';
-            } else {
-                marginImpactEl.style.display = 'block';
-                fxImpactEl.style.display = 'block';
-                
-                const marginText = `${changePercent > 0 ? '+' : ''}${marginImpact.toLocaleString()} impact`;
-                const fxText = `${changePercent > 0 ? '+' : ''}${fxImpact.toLocaleString()} impact`;
-                
-                marginImpactEl.textContent = marginText;
-                fxImpactEl.textContent = fxText;
-                
-                marginImpactEl.className = `scenario-impact ${changePercent > 0 ? 'positive' : 'negative'}`;
-                fxImpactEl.className = `scenario-impact ${changePercent > 0 ? 'positive' : 'negative'}`;
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                AR Collection Days: {arCollectionDays[0]}
+              </label>
+              <Slider
+                value={arCollectionDays}
+                onValueChange={setArCollectionDays}
+                max={75}
+                min={15}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hedging Strategy Section */}
+        <Card className="mb-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-green-700">Hedging Strategy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                Hedge Ratio: {hedgeRatio[0]}%
+              </label>
+              <Slider
+                value={hedgeRatio}
+                onValueChange={setHedgeRatio}
+                max={100}
+                min={0}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Market Scenarios Section */}
+        <Card className="mb-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-purple-700">Market Scenarios</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                USD/MXN Rate: {usdMxnRate[0].toFixed(2)}
+              </label>
+              <Slider
+                value={usdMxnRate}
+                onValueChange={setUsdMxnRate}
+                max={25}
+                min={15}
+                step={0.1}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                Volatility: {volatility[0]}%
+              </label>
+              <Slider
+                value={volatility}
+                onValueChange={setVolatility}
+                max={35}
+                min={10}
+                step={0.5}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">
+                Confidence Level
+              </label>
+              <Select value={confidenceLevel[0]} onValueChange={(value) => setConfidenceLevel([value])}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="90">90%</SelectItem>
+                  <SelectItem value="95">95%</SelectItem>
+                  <SelectItem value="99">99%</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Dashboard - Excel Style */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">FX Risk Management Dashboard</h1>
+        
+        {/* VaR Report Section */}
+        <VaRReportSection />
+
+        {/* Operational Strategy */}
+        <ExcelTable 
+          title="Operational Strategy"
+          backgroundColor="bg-blue-50"
+          data={[
+            {
+              label: "Contractual Sales",
+              annual: adjustedData.operationalStrategy.contractualSales[0],
+              monthly: adjustedData.operationalStrategy.contractualSales.slice(1)
+            },
+            {
+              label: "IC Sales", 
+              annual: adjustedData.operationalStrategy.icSales[0],
+              monthly: adjustedData.operationalStrategy.icSales.slice(1)
+            },
+            {
+              label: "Forecasted Purchases",
+              annual: adjustedData.operationalStrategy.forecastedPurchases[0],
+              monthly: adjustedData.operationalStrategy.forecastedPurchases.slice(1)
+            },
+            {
+              label: "Position Exposed on Variable Contribution Margin",
+              annual: adjustedData.operationalStrategy.variableContributionMargin[0],
+              monthly: adjustedData.operationalStrategy.variableContributionMargin.slice(1)
             }
-            
-            // Update table values
-            document.getElementById('marginLoss').textContent = (baseData.marginLoss + Math.abs(marginImpact)).toLocaleString();
-            document.getElementById('fxLoss').textContent = (baseData.fxLoss + Math.abs(fxImpact)).toLocaleString();
-        }
+          ]}
+        />
 
-        // Toggle entity visibility
-        function toggleEntity(entityType) {
-            const checkbox = document.getElementById(entityType);
-            const datasetIndex = entityType === 'opStrategy' ? 0 : 1;
-            
-            const dataset = netPositionChart.data.datasets[datasetIndex];
-            dataset.hidden = !checkbox.checked;
-            
-            netPositionChart.update();
-        }
+        {/* Balance Sheet Management */}
+        <ExcelTable 
+          title="Balance Sheet Management"
+          backgroundColor="bg-green-50"
+          data={[
+            {
+              label: "Cash & cash equivalents",
+              annual: adjustedData.balanceSheetData.cashEquivalents[0],
+              monthly: adjustedData.balanceSheetData.cashEquivalents.slice(1)
+            },
+            {
+              label: "AR - IC",
+              annual: adjustedData.balanceSheetData.arIC[0],
+              monthly: adjustedData.balanceSheetData.arIC.slice(1)
+            },
+            {
+              label: "Long Position",
+              annual: adjustedData.balanceSheetData.longPosition[0],
+              monthly: adjustedData.balanceSheetData.longPosition.slice(1)
+            },
+            {
+              label: "AP - 3rd Party",
+              annual: adjustedData.balanceSheetData.apThirdParty[0],
+              monthly: adjustedData.balanceSheetData.apThirdParty.slice(1)
+            },
+            {
+              label: "Short Position",
+              annual: adjustedData.balanceSheetData.shortPosition[0],
+              monthly: adjustedData.balanceSheetData.shortPosition.slice(1)
+            },
+            {
+              label: "Position to impact Foreign Exchange Losses",
+              annual: adjustedData.balanceSheetData.fxLossesPosition[0],
+              monthly: adjustedData.balanceSheetData.fxLossesPosition.slice(1)
+            },
+            {
+              label: "Position Exposed on EBTDA",
+              annual: adjustedData.balanceSheetData.ebitdaPosition[0],
+              monthly: adjustedData.balanceSheetData.ebitdaPosition.slice(1)
+            }
+          ]}
+        />
+      </div>
+    </div>
+  );
+};
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initChart();
-        });
-    </script>
-</body>
-</html>
+export default FXRiskDashboard;
