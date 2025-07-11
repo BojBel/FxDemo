@@ -1,547 +1,395 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Risk Management Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+        }
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+        .control-panel {
+            width: 320px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .main-dashboard {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .control-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+            margin-bottom: 8px;
+        }
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .excel-table th, .excel-table td {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            text-align: right;
+        }
+        .excel-table th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .excel-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .negative {
+            color: #dc2626;
+        }
+        .var-section {
+            background-color: #eff6ff;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .var-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        .var-card {
+            background: white;
+            padding: 16px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Left Control Panel -->
+        <div class="control-panel">
+            <h2>FX Risk Controls</h2>
+            
+            <div class="control-section">
+                <h3 style="color: #1d4ed8;">Payment Terms</h3>
+                <div style="margin-bottom: 16px;">
+                    <label>AP Payment Days: <span id="ap-days">30</span></label>
+                    <input type="range" min="15" max="90" step="5" value="30" class="slider" id="ap-slider">
+                </div>
+                <div>
+                    <label>AR Collection Days: <span id="ar-days">45</span></label>
+                    <input type="range" min="15" max="75" step="5" value="45" class="slider" id="ar-slider">
+                </div>
+            </div>
 
-const FXRiskDashboard = () => {
-  // Baseline data from the Excel file
-  const baselineData = {
-    operationalStrategy: {
-      contractualSales: [35225, 3378, 5304, 2517, 2482, 2693, 2693, 2693, 2693, 2693, 2693, 2693, 2693],
-      icSales: [618455, 67891, 63857, 71648, 75454, 51738, 53601, 48031, 35015, 39632, 42662, 35488, 33438],
-      forecastedPurchases: [-522343, -62086, -55911, -59751, -45981, -44855, -41355, -35296, -35412, -35122, -36711, -35919, -33944],
-      variableContributionMargin: [-1704743.78, -134787.43, -149519.93, -149133.12, -83022.45, -129761.28, -142961.94, -153345.15, -160063.55, -153573.87, -152321.92, -150708.57, -145544.58]
-    },
-    
-    balanceSheetData: {
-      cashEquivalents: [12808, 1141, 1239, 1050, 1064, 1001, 1001, 1252, 1395, 978, 934, 1550, 2493],
-      arIC: [49772, 23533, 17478, 17825, 18656, 14079, 15536, 12713, 9546, 9835, 10500, 9198, 8527],
-      longPosition: [65580, 64910, 29160, 32024, 35337, 33453, 37603, 37474, 36999, 39982, 43339, 44730, 46752],
-      apThirdParty: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
-      shortPosition: [-40382, -62086, -77614, -75280, -65350, -50453, -45827, -36268, -30325, -30152, -31451, -32248, -29481],
-      fxLossesPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271],
-      ebitdaPosition: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271]
-    },
-    
-    months: ['Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25']
-  };
+            <div class="control-section">
+                <h3 style="color: #059669;">Hedging Strategy</h3>
+                <div>
+                    <label>Hedge Ratio: <span id="hedge-ratio">0</span>%</label>
+                    <input type="range" min="0" max="100" step="5" value="0" class="slider" id="hedge-slider">
+                </div>
+            </div>
 
-  // Control states (using simple values, not arrays)
-  const [apPaymentDays, setApPaymentDays] = useState(30);
-  const [arCollectionDays, setArCollectionDays] = useState(45);
-  const [hedgeRatio, setHedgeRatio] = useState(0);
-  const [usdMxnRate, setUsdMxnRate] = useState(20.0);
-  const [volatility, setVolatility] = useState(19.5);
-  const [confidenceLevel, setConfidenceLevel] = useState('95');
-
-  // Adjusted values based on controls
-  const [adjustedData, setAdjustedData] = useState(baselineData);
-
-  // Calculate adjustments based on control changes
-  useEffect(() => {
-    const calculateAdjustments = () => {
-      const apImpact = (30 - apPaymentDays) / 30 * 0.15;
-      const arImpact = (45 - arCollectionDays) / 45 * 0.2;
-      const hedgeImpact = hedgeRatio / 100;
-      const rateImpact = (usdMxnRate - 20.0) / 20.0;
-
-      // Adjust all the data arrays
-      const newData = { ...baselineData };
-      
-      // Adjust operational strategy
-      newData.operationalStrategy = {
-        ...baselineData.operationalStrategy,
-        variableContributionMargin: baselineData.operationalStrategy.variableContributionMargin.map(val => 
-          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
-        )
-      };
-
-      // Adjust balance sheet data
-      newData.balanceSheetData = {
-        ...baselineData.balanceSheetData,
-        fxLossesPosition: baselineData.balanceSheetData.fxLossesPosition.map(val => 
-          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
-        ),
-        ebitdaPosition: baselineData.balanceSheetData.ebitdaPosition.map(val => 
-          val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact)
-        )
-      };
-
-      setAdjustedData(newData);
-    };
-
-    calculateAdjustments();
-  }, [apPaymentDays, arCollectionDays, hedgeRatio, usdMxnRate, volatility, confidenceLevel]);
-
-  // Format numbers for display
-  const formatNumber = (num) => {
-    if (num === undefined || num === null || isNaN(num)) {
-      return '0';
-    }
-    
-    const numValue = Number(num);
-    return numValue.toLocaleString('en-US', { 
-      minimumFractionDigits: 0, 
-      maximumFractionDigits: 0 
-    });
-  };
-
-  // VaR Report section
-  const VaRReportSection = () => {
-    const varParams = {
-      volatility: volatility / 100,
-      confidenceInterval: parseInt(confidenceLevel) / 100,
-      timeHorizon: Math.sqrt(1/12)
-    };
-
-    const confidenceMultiplier = confidenceLevel === '95' ? 1.645 : confidenceLevel === '99' ? 2.326 : 1.282;
-    const variableContributionExposure = adjustedData.operationalStrategy.variableContributionMargin[0];
-    const plValueAtRisk = Math.abs(variableContributionExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
-    
-    const unrealizedFXExposure = adjustedData.balanceSheetData.fxLossesPosition[0];
-    const bsValueAtRisk = Math.abs(unrealizedFXExposure) * varParams.volatility * varParams.timeHorizon * confidenceMultiplier;
-
-    return (
-      <div style={{ backgroundColor: '#eff6ff', padding: '24px', borderRadius: '8px', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e3a8a', marginBottom: '16px' }}>
-          FX Management Financial Statement Impact - Mexico
-        </h2>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Date: {new Date().toLocaleDateString()}</div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Functional Currency: MXN</div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>Exposure: USD</div>
-          </div>
-          
-          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Transactional Currency: USD</div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Functional Currency: MXN</div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>Region: Mexico</div>
-          </div>
+            <div class="control-section">
+                <h3 style="color: #7c3aed;">Market Scenarios</h3>
+                <div style="margin-bottom: 16px;">
+                    <label>USD/MXN Rate: <span id="usd-rate">20.0</span></label>
+                    <input type="range" min="15" max="25" step="0.1" value="20.0" class="slider" id="rate-slider">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label>Volatility: <span id="volatility">19.5</span>%</label>
+                    <input type="range" min="10" max="35" step="0.5" value="19.5" class="slider" id="vol-slider">
+                </div>
+                <div>
+                    <label>Confidence Level:</label>
+                    <select id="confidence" style="width: 100%; padding: 8px; margin-top: 8px;">
+                        <option value="90">90%</option>
+                        <option value="95" selected>95%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px' }}>
-          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Variable Contribution Margin Exposure</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#dc2626' }}>{formatNumber(variableContributionExposure)}</div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>P&L Value at Risk</div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ea580c' }}>{formatNumber(plValueAtRisk)}</div>
-          </div>
+        <!-- Main Dashboard -->
+        <div class="main-dashboard">
+            <h1>FX Risk Management Dashboard</h1>
+            
+            <!-- VaR Report Section -->
+            <div class="var-section">
+                <h2 style="color: #1e3a8a;">FX Management Financial Statement Impact - Mexico</h2>
+                <div class="var-grid">
+                    <div class="var-card">
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Variable Contribution Margin Exposure</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #dc2626;" id="vcm-exposure">-1,704,744</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">P&L Value at Risk</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #ea580c;" id="pl-var">157,839</div>
+                    </div>
+                    <div class="var-card">
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Unrealized FX Exposure</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2563eb;" id="fx-exposure">25,197</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">B/S Value at Risk</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #16a34a;" id="bs-var">2,330</div>
+                    </div>
+                </div>
+            </div>
 
-          <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Unrealized FX Exposure</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb' }}>{formatNumber(unrealizedFXExposure)}</div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>B/S Value at Risk</div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#16a34a' }}>{formatNumber(bsValueAtRisk)}</div>
-          </div>
+            <!-- Operational Strategy Table -->
+            <div style="background: #eff6ff; padding: 12px; margin-bottom: 2px;">
+                <h3>Operational Strategy</h3>
+            </div>
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Item</th>
+                        <th>12mo Forecast</th>
+                        <th>Jan-25</th>
+                        <th>Feb-25</th>
+                        <th>Mar-25</th>
+                        <th>Apr-25</th>
+                        <th>May-25</th>
+                        <th>Jun-25</th>
+                        <th>Jul-25</th>
+                        <th>Aug-25</th>
+                        <th>Sep-25</th>
+                        <th>Oct-25</th>
+                        <th>Nov-25</th>
+                        <th>Dec-25</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left;">Contractual Sales</td>
+                        <td>35,225</td>
+                        <td>3,378</td>
+                        <td>5,304</td>
+                        <td>2,517</td>
+                        <td>2,482</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                        <td>2,693</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">IC Sales</td>
+                        <td>618,455</td>
+                        <td>67,891</td>
+                        <td>63,857</td>
+                        <td>71,648</td>
+                        <td>75,454</td>
+                        <td>51,738</td>
+                        <td>53,601</td>
+                        <td>48,031</td>
+                        <td>35,015</td>
+                        <td>39,632</td>
+                        <td>42,662</td>
+                        <td>35,488</td>
+                        <td>33,438</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Forecasted Purchases</td>
+                        <td class="negative">-522,343</td>
+                        <td class="negative">-62,086</td>
+                        <td class="negative">-55,911</td>
+                        <td class="negative">-59,751</td>
+                        <td class="negative">-45,981</td>
+                        <td class="negative">-44,855</td>
+                        <td class="negative">-41,355</td>
+                        <td class="negative">-35,296</td>
+                        <td class="negative">-35,412</td>
+                        <td class="negative">-35,122</td>
+                        <td class="negative">-36,711</td>
+                        <td class="negative">-35,919</td>
+                        <td class="negative">-33,944</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Variable Contribution Margin</td>
+                        <td class="negative" id="vcm-annual">-1,704,744</td>
+                        <td class="negative" id="vcm-jan">-134,787</td>
+                        <td class="negative" id="vcm-feb">-149,520</td>
+                        <td class="negative" id="vcm-mar">-149,133</td>
+                        <td class="negative" id="vcm-apr">-83,022</td>
+                        <td class="negative" id="vcm-may">-129,761</td>
+                        <td class="negative" id="vcm-jun">-142,962</td>
+                        <td class="negative" id="vcm-jul">-153,345</td>
+                        <td class="negative" id="vcm-aug">-160,064</td>
+                        <td class="negative" id="vcm-sep">-153,574</td>
+                        <td class="negative" id="vcm-oct">-152,322</td>
+                        <td class="negative" id="vcm-nov">-150,709</td>
+                        <td class="negative" id="vcm-dec">-145,545</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Balance Sheet Management Table -->
+            <div style="background: #f0fdf4; padding: 12px; margin-bottom: 2px;">
+                <h3>Balance Sheet Management</h3>
+            </div>
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Item</th>
+                        <th>Current Position</th>
+                        <th>Jan-25</th>
+                        <th>Feb-25</th>
+                        <th>Mar-25</th>
+                        <th>Apr-25</th>
+                        <th>May-25</th>
+                        <th>Jun-25</th>
+                        <th>Jul-25</th>
+                        <th>Aug-25</th>
+                        <th>Sep-25</th>
+                        <th>Oct-25</th>
+                        <th>Nov-25</th>
+                        <th>Dec-25</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left;">Position to impact FX Losses</td>
+                        <td id="fx-current">25,197</td>
+                        <td id="fx-jan">2,824</td>
+                        <td class="negative" id="fx-feb">-48,455</td>
+                        <td class="negative" id="fx-mar">-43,255</td>
+                        <td class="negative" id="fx-apr">-30,013</td>
+                        <td class="negative" id="fx-may">-17,000</td>
+                        <td class="negative" id="fx-jun">-8,224</td>
+                        <td id="fx-jul">1,206</td>
+                        <td id="fx-aug">6,674</td>
+                        <td id="fx-sep">9,830</td>
+                        <td id="fx-oct">11,887</td>
+                        <td id="fx-nov">12,482</td>
+                        <td id="fx-dec">17,271</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Position Exposed on EBITDA</td>
+                        <td id="ebitda-current">25,197</td>
+                        <td id="ebitda-jan">2,824</td>
+                        <td class="negative" id="ebitda-feb">-48,455</td>
+                        <td class="negative" id="ebitda-mar">-43,255</td>
+                        <td class="negative" id="ebitda-apr">-30,013</td>
+                        <td class="negative" id="ebitda-may">-17,000</td>
+                        <td class="negative" id="ebitda-jun">-8,224</td>
+                        <td id="ebitda-jul">1,206</td>
+                        <td id="ebitda-aug">6,674</td>
+                        <td id="ebitda-sep">9,830</td>
+                        <td id="ebitda-oct">11,887</td>
+                        <td id="ebitda-nov">12,482</td>
+                        <td id="ebitda-dec">17,271</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
-        <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '4px', border: '1px solid #d1d5db', marginTop: '24px' }}>
-          <h4 style={{ fontWeight: 'bold', color: '#374151', marginBottom: '12px' }}>Value at Risk Parameters</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', fontSize: '14px' }}>
-            <div>
-              <span style={{ color: '#6b7280' }}>Volatility:</span>
-              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{(volatility / 100).toFixed(3)}</span>
-            </div>
-            <div>
-              <span style={{ color: '#6b7280' }}>Confidence Interval:</span>
-              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{(parseInt(confidenceLevel) / 100).toFixed(2)}</span>
-            </div>
-            <div>
-              <span style={{ color: '#6b7280' }}>Time Horizon:</span>
-              <span style={{ marginLeft: '8px', fontWeight: '600' }}>{varParams.timeHorizon.toFixed(3)} (Monthly)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Excel-style table component
-  const ExcelTable = ({ title, data, backgroundColor = "#f9fafb" }) => (
-    <div style={{ marginBottom: '24px' }}>
-      <div style={{ backgroundColor, padding: '12px', borderBottom: '2px solid #d1d5db' }}>
-        <h3 style={{ fontWeight: 'bold', color: '#374151', margin: 0 }}>{title}</h3>
-      </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f3f4f6' }}>
-              <th style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'left', fontWeight: '600' }}>Item</th>
-              <th style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right', fontWeight: '600' }}>12mo Forecast</th>
-              {baselineData.months.map(month => (
-                <th key={month} style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right', fontWeight: '600' }}>{month}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? "white" : "#f9fafb" }}>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px', fontWeight: '500' }}>{row.label}</td>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right' }}>{formatNumber(row.annual)}</td>
-                {row.monthly.map((value, monthIndex) => (
-                  <td key={monthIndex} style={{ 
-                    border: '1px solid #d1d5db', 
-                    padding: '8px', 
-                    textAlign: 'right',
-                    color: value < 0 ? '#dc2626' : '#000000'
-                  }}>
-                    {formatNumber(value)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
-  );
 
-  return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#f9fafb' }}>
-      {/* Left Control Panel */}
-      <div style={{ 
-        width: '320px', 
-        backgroundColor: 'white', 
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
-        padding: '24px', 
-        overflowY: 'auto' 
-      }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '24px' }}>
-          FX Risk Controls
-        </h2>
-        
-        {/* Payment Terms Section */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          border: '1px solid #e5e7eb', 
-          borderRadius: '8px', 
-          padding: '16px', 
-          marginBottom: '16px' 
-        }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#1d4ed8', marginBottom: '12px' }}>
-            Payment Terms
-          </h3>
-          
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              AP Payment Days: {apPaymentDays}
-            </label>
-            <input
-              type="range"
-              min="15"
-              max="90"
-              step="5"
-              value={apPaymentDays}
-              onChange={(e) => setApPaymentDays(parseInt(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: '#e5e7eb',
-                outline: 'none',
-                marginBottom: '8px'
-              }}
-            />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              color: '#9ca3af' 
-            }}>
-              <span>15</span>
-              <span>90</span>
-            </div>
-          </div>
-          
-          <div>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              AR Collection Days: {arCollectionDays}
-            </label>
-            <input
-              type="range"
-              min="15"
-              max="75"
-              step="5"
-              value={arCollectionDays}
-              onChange={(e) => setArCollectionDays(parseInt(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: '#e5e7eb',
-                outline: 'none',
-                marginBottom: '8px'
-              }}
-            />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              color: '#9ca3af' 
-            }}>
-              <span>15</span>
-              <span>75</span>
-            </div>
-          </div>
-        </div>
+    <script>
+        // Baseline data
+        const baselineData = {
+            vcm: [-1704744, -134787, -149520, -149133, -83022, -129761, -142962, -153345, -160064, -153574, -152322, -150709, -145545],
+            fx: [25197, 2824, -48455, -43255, -30013, -17000, -8224, 1206, 6674, 9830, 11887, 12482, 17271]
+        };
 
-        {/* Hedging Strategy Section */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          border: '1px solid #e5e7eb', 
-          borderRadius: '8px', 
-          padding: '16px', 
-          marginBottom: '16px' 
-        }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#059669', marginBottom: '12px' }}>
-            Hedging Strategy
-          </h3>
-          <div>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              Hedge Ratio: {hedgeRatio}%
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={hedgeRatio}
-              onChange={(e) => setHedgeRatio(parseInt(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: '#e5e7eb',
-                outline: 'none',
-                marginBottom: '8px'
-              }}
-            />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              color: '#9ca3af' 
-            }}>
-              <span>0%</span>
-              <span>100%</span>
-            </div>
-          </div>
-        </div>
+        // Control elements
+        const apSlider = document.getElementById('ap-slider');
+        const arSlider = document.getElementById('ar-slider');
+        const hedgeSlider = document.getElementById('hedge-slider');
+        const rateSlider = document.getElementById('rate-slider');
+        const volSlider = document.getElementById('vol-slider');
+        const confidenceSelect = document.getElementById('confidence');
 
-        {/* Market Scenarios Section */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          border: '1px solid #e5e7eb', 
-          borderRadius: '8px', 
-          padding: '16px', 
-          marginBottom: '16px' 
-        }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#7c3aed', marginBottom: '12px' }}>
-            Market Scenarios
-          </h3>
-          
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              USD/MXN Rate: {usdMxnRate.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="15"
-              max="25"
-              step="0.1"
-              value={usdMxnRate}
-              onChange={(e) => setUsdMxnRate(parseFloat(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: '#e5e7eb',
-                outline: 'none',
-                marginBottom: '8px'
-              }}
-            />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              color: '#9ca3af' 
-            }}>
-              <span>15.0</span>
-              <span>25.0</span>
-            </div>
-          </div>
+        // Update displays
+        function updateDisplays() {
+            document.getElementById('ap-days').textContent = apSlider.value;
+            document.getElementById('ar-days').textContent = arSlider.value;
+            document.getElementById('hedge-ratio').textContent = hedgeSlider.value;
+            document.getElementById('usd-rate').textContent = parseFloat(rateSlider.value).toFixed(2);
+            document.getElementById('volatility').textContent = volSlider.value;
+        }
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              Volatility: {volatility}%
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="35"
-              step="0.5"
-              value={volatility}
-              onChange={(e) => setVolatility(parseFloat(e.target.value))}
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                background: '#e5e7eb',
-                outline: 'none',
-                marginBottom: '8px'
-              }}
-            />
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              fontSize: '10px', 
-              color: '#9ca3af' 
-            }}>
-              <span>10%</span>
-              <span>35%</span>
-            </div>
-          </div>
+        // Calculate adjustments
+        function calculateAdjustments() {
+            const apImpact = (30 - parseInt(apSlider.value)) / 30 * 0.15;
+            const arImpact = (45 - parseInt(arSlider.value)) / 45 * 0.2;
+            const hedgeImpact = parseInt(hedgeSlider.value) / 100;
+            const rateImpact = (parseFloat(rateSlider.value) - 20.0) / 20.0;
 
-          <div>
-            <label style={{ 
-              fontSize: '12px', 
-              fontWeight: '500', 
-              color: '#6b7280', 
-              display: 'block', 
-              marginBottom: '8px' 
-            }}>
-              Confidence Level
-            </label>
-            <select
-              value={confidenceLevel}
-              onChange={(e) => setConfidenceLevel(e.target.value)}
-              style={{ 
-                width: '100%', 
-                padding: '8px', 
-                border: '1px solid #d1d5db', 
-                borderRadius: '4px',
-                fontSize: '14px'
-              }}
-            >
-              <option value="90">90%</option>
-              <option value="95">95%</option>
-              <option value="99">99%</option>
-            </select>
-          </div>
-        </div>
-      </div>
+            // Update VCM values
+            baselineData.vcm.forEach((val, index) => {
+                const adjusted = val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
+                const elementId = index === 0 ? 'vcm-annual' : `vcm-${['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][index-1]}`;
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = Math.round(adjusted).toLocaleString();
+                }
+            });
 
-      {/* Main Dashboard - Excel Style */}
-      <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#374151', marginBottom: '24px' }}>
-          FX Risk Management Dashboard
-        </h1>
-        
-        {/* VaR Report Section */}
-        <VaRReportSection />
+            // Update FX values
+            baselineData.fx.forEach((val, index) => {
+                const adjusted = val * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
+                const fxElementId = index === 0 ? 'fx-current' : `fx-${['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][index-1]}`;
+                const ebitdaElementId = index === 0 ? 'ebitda-current' : `ebitda-${['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][index-1]}`;
+                
+                const fxElement = document.getElementById(fxElementId);
+                const ebitdaElement = document.getElementById(ebitdaElementId);
+                
+                if (fxElement) fxElement.textContent = Math.round(adjusted).toLocaleString();
+                if (ebitdaElement) ebitdaElement.textContent = Math.round(adjusted).toLocaleString();
+            });
 
-        {/* Operational Strategy */}
-        <ExcelTable 
-          title="Operational Strategy"
-          backgroundColor="#eff6ff"
-          data={[
-            {
-              label: "Contractual Sales",
-              annual: adjustedData.operationalStrategy.contractualSales[0],
-              monthly: adjustedData.operationalStrategy.contractualSales.slice(1)
-            },
-            {
-              label: "IC Sales", 
-              annual: adjustedData.operationalStrategy.icSales[0],
-              monthly: adjustedData.operationalStrategy.icSales.slice(1)
-            },
-            {
-              label: "Forecasted Purchases",
-              annual: adjustedData.operationalStrategy.forecastedPurchases[0],
-              monthly: adjustedData.operationalStrategy.forecastedPurchases.slice(1)
-            },
-            {
-              label: "Position Exposed on Variable Contribution Margin",
-              annual: adjustedData.operationalStrategy.variableContributionMargin[0],
-              monthly: adjustedData.operationalStrategy.variableContributionMargin.slice(1)
-            }
-          ]}
-        />
+            // Update VaR calculations
+            const volatility = parseFloat(volSlider.value) / 100;
+            const confidence = parseInt(confidenceSelect.value);
+            const confidenceMultiplier = confidence === 95 ? 1.645 : confidence === 99 ? 2.326 : 1.282;
+            const timeHorizon = Math.sqrt(1/12);
 
-        {/* Balance Sheet Management */}
-        <ExcelTable 
-          title="Balance Sheet Management"
-          backgroundColor="#f0fdf4"
-          data={[
-            {
-              label: "Cash & cash equivalents",
-              annual: adjustedData.balanceSheetData.cashEquivalents[0],
-              monthly: adjustedData.balanceSheetData.cashEquivalents.slice(1)
-            },
-            {
-              label: "AR - IC",
-              annual: adjustedData.balanceSheetData.arIC[0],
-              monthly: adjustedData.balanceSheetData.arIC.slice(1)
-            },
-            {
-              label: "Long Position",
-              annual: adjustedData.balanceSheetData.longPosition[0],
-              monthly: adjustedData.balanceSheetData.longPosition.slice(1)
-            },
-            {
-              label: "AP - 3rd Party",
-              annual: adjustedData.balanceSheetData.apThirdParty[0],
-              monthly: adjustedData.balanceSheetData.apThirdParty.slice(1)
-            },
-            {
-              label: "Short Position",
-              annual: adjustedData.balanceSheetData.shortPosition[0],
-              monthly: adjustedData.balanceSheetData.shortPosition.slice(1)
-            },
-            {
-              label: "Position to impact Foreign Exchange Losses",
-              annual: adjustedData.balanceSheetData.fxLossesPosition[0],
-              monthly: adjustedData.balanceSheetData.fxLossesPosition.slice(1)
-            },
-            {
-              label: "Position Exposed on EBTDA",
-              annual: adjustedData.balanceSheetData.ebitdaPosition[0],
-              monthly: adjustedData.balanceSheetData.ebitdaPosition.slice(1)
-            }
-          ]}
-        />
-      </div>
-    </div>
-  );
-};
+            const vcmExposure = baselineData.vcm[0] * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
+            const plVar = Math.abs(vcmExposure) * volatility * timeHorizon * confidenceMultiplier;
+            
+            const fxExposure = baselineData.fx[0] * (1 + apImpact + arImpact + rateImpact) * (1 - hedgeImpact);
+            const bsVar = Math.abs(fxExposure) * volatility * timeHorizon * confidenceMultiplier;
 
-export default FXRiskDashboard;
+            document.getElementById('vcm-exposure').textContent = Math.round(vcmExposure).toLocaleString();
+            document.getElementById('pl-var').textContent = Math.round(plVar).toLocaleString();
+            document.getElementById('fx-exposure').textContent = Math.round(fxExposure).toLocaleString();
+            document.getElementById('bs-var').textContent = Math.round(bsVar).toLocaleString();
+        }
+
+        // Event listeners
+        [apSlider, arSlider, hedgeSlider, rateSlider, volSlider].forEach(slider => {
+            slider.addEventListener('input', () => {
+                updateDisplays();
+                calculateAdjustments();
+            });
+        });
+
+        confidenceSelect.addEventListener('change', calculateAdjustments);
+
+        // Initialize
+        updateDisplays();
+        calculateAdjustments();
+    </script>
+</body>
+</html>
