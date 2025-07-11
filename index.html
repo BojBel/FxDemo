@@ -381,7 +381,7 @@
         // Calculate adjustments
         function calculateAdjustments() {
             const apImpact = (30 - parseInt(apSlider.value)) / 30 * 0.15;
-            const arImpact = (45 - parseInt(arSlider.value)) / 45 * 0.2;
+            const arImpact = (parseInt(arSlider.value) - 45) / 45 * 0.2;
             const hedgeImpact = parseInt(hedgeSlider.value) / 100;
             const rateImpact = (parseFloat(rateSlider.value) - 20.0) / 20.0;
 
