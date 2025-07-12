@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FX Risk Calculator - Denar Financial</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -91,14 +90,7 @@
             gap: 3rem;
         }
 
-        .input-section {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .results-section {
+        .input-section, .results-section {
             background: white;
             border-radius: 12px;
             padding: 2rem;
@@ -142,6 +134,24 @@
             margin-bottom: 1rem;
             border-bottom: 2px solid #008080;
             padding-bottom: 0.5rem;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: #008080;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .calculate-btn:hover {
+            background: #006666;
         }
 
         .risk-summary {
@@ -211,11 +221,6 @@
         .scenario-positive { background: #d1fae5; color: #065f46; }
         .scenario-negative { background: #fee2e2; color: #991b1b; }
         .scenario-neutral { background: #f3f4f6; color: #374151; }
-
-        .chart-container {
-            height: 250px;
-            margin: 1rem 0;
-        }
 
         .recommendation-box {
             background: #f0fdf4;
@@ -302,7 +307,7 @@
 
     <div class="container">
         <h1 class="page-title">FX Risk Calculator</h1>
-        <p class="subtitle">Get an instant assessment of your foreign exchange risk exposure using our AI-powered analytics</p>
+        <p class="subtitle">Get an instant assessment of your foreign exchange risk exposure</p>
         
         <div class="calculator-layout">
             <div class="input-section">
@@ -310,9 +315,9 @@
                 
                 <div class="form-group">
                     <label for="companyRevenue">Annual Revenue (USD)</label>
-                    <select id="companyRevenue" onchange="calculateRisk()">
+                    <select id="companyRevenue">
                         <option value="5000000">$5M - $10M</option>
-                        <option value="15000000">$10M - $20M</option>
+                        <option value="15000000" selected>$10M - $20M</option>
                         <option value="35000000">$20M - $50M</option>
                         <option value="75000000">$50M - $100M</option>
                         <option value="150000000">$100M+</option>
@@ -321,8 +326,8 @@
 
                 <div class="form-group">
                     <label for="industry">Industry</label>
-                    <select id="industry" onchange="calculateRisk()">
-                        <option value="manufacturing">Manufacturing</option>
+                    <select id="industry">
+                        <option value="manufacturing" selected>Manufacturing</option>
                         <option value="automotive">Automotive</option>
                         <option value="electronics">Electronics</option>
                         <option value="retail">Retail/Import</option>
@@ -335,53 +340,41 @@
 
                 <div class="form-group">
                     <label for="accountsReceivable">Accounts Receivable (MXN)</label>
-                    <input type="number" id="accountsReceivable" placeholder="0" step="100000" oninput="calculateRisk()">
+                    <input type="number" id="accountsReceivable" value="5000000" step="100000">
                     <div class="input-helper">Money owed to you in Mexican pesos</div>
                 </div>
 
                 <div class="form-group">
                     <label for="accountsPayable">Accounts Payable (MXN)</label>
-                    <input type="number" id="accountsPayable" placeholder="0" step="100000" oninput="calculateRisk()">
+                    <input type="number" id="accountsPayable" value="3000000" step="100000">
                     <div class="input-helper">Money you owe in Mexican pesos</div>
                 </div>
 
                 <div class="form-group">
                     <label for="cashPosition">Cash Position (MXN)</label>
-                    <input type="number" id="cashPosition" placeholder="0" step="100000" oninput="calculateRisk()">
+                    <input type="number" id="cashPosition" value="1000000" step="100000">
                     <div class="input-helper">Cash held in Mexican pesos</div>
                 </div>
 
                 <div class="form-group">
                     <label for="monthlyRevenue">Monthly Revenue from Mexico (MXN)</label>
-                    <input type="number" id="monthlyRevenue" placeholder="0" step="100000" oninput="calculateRisk()">
+                    <input type="number" id="monthlyRevenue" value="2000000" step="100000">
                     <div class="input-helper">Average monthly revenue in pesos</div>
                 </div>
 
                 <div class="form-group">
                     <label for="monthlyExpenses">Monthly Expenses in Mexico (MXN)</label>
-                    <input type="number" id="monthlyExpenses" placeholder="0" step="100000" oninput="calculateRisk()">
+                    <input type="number" id="monthlyExpenses" value="1200000" step="100000">
                     <div class="input-helper">Average monthly costs (payroll, rent, suppliers, etc.)</div>
                 </div>
 
                 <div class="form-group">
                     <label for="currentRate">Current USD/MXN Rate</label>
-                    <input type="number" id="currentRate" value="18.45" step="0.01" oninput="calculateRisk()">
+                    <input type="number" id="currentRate" value="18.45" step="0.01">
                     <div class="input-helper">Current exchange rate</div>
                 </div>
 
-                <button type="button" onclick="calculateRisk()" style="
-                    width: 100%;
-                    background: #008080;
-                    color: white;
-                    padding: 1rem 2rem;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    margin-top: 1rem;
-                    transition: background 0.3s;
-                " onmouseover="this.style.background='#006666'" onmouseout="this.style.background='#008080'">
+                <button type="button" class="calculate-btn" onclick="calculateRisk()">
                     Calculate FX Risk
                 </button>
             </div>
@@ -390,8 +383,8 @@
                 <h3 class="section-title">Risk Assessment</h3>
                 
                 <div id="riskSummary" class="risk-summary">
-                    <div class="risk-level">Enter your data to see results</div>
-                    <div>Complete the form on the left to get your FX risk assessment</div>
+                    <div class="risk-level">Click "Calculate FX Risk" to see results</div>
+                    <div>Enter your data and click the button to get your assessment</div>
                 </div>
 
                 <div class="metrics-grid">
@@ -439,10 +432,6 @@
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <canvas id="riskChart"></canvas>
-                </div>
-
                 <div id="recommendationBox" class="recommendation-box" style="display: none;">
                     <div class="recommendation-title">Recommended Solution</div>
                     <div id="recommendationText"></div>
@@ -460,46 +449,6 @@
     </div>
 
     <script>
-        let riskChart = null;
-
-        // Core calculation functions (based on your Excel logic)
-        function calculateNetExposure(ar, ap, cash, futureRevenue) {
-            return ar - ap + cash + futureRevenue;
-        }
-
-        function calculateVaR(netExposure, volatility = 0.015, confidence = 0.95) {
-            const zScore = confidence === 0.95 ? 1.65 : 2.33;
-            
-            return {
-                dailyVaR: Math.abs(netExposure) * volatility * zScore,
-                weeklyVaR: Math.abs(netExposure) * volatility * zScore * Math.sqrt(5),
-                monthlyVaR: Math.abs(netExposure) * volatility * zScore * Math.sqrt(22)
-            };
-        }
-
-        function calculateScenarios(netExposure) {
-            return {
-                bullCase: netExposure * 0.10,
-                moderateBull: netExposure * 0.05,
-                current: 0,
-                moderateBear: netExposure * -0.05,
-                bearCase: netExposure * -0.10
-            };
-        }
-
-        function assessRiskLevel(exposurePercent, varPercent) {
-            if (exposurePercent > 15 || varPercent > 2) return 'Critical';
-            if (exposurePercent > 10 || varPercent > 1.5) return 'High';
-            if (exposurePercent > 5 || varPercent > 1) return 'Medium';
-            return 'Low';
-        }
-
-        function recommendService(riskLevel, revenue) {
-            if (riskLevel === 'Critical' || revenue > 50000000) return 'Premium AI Solutions ($3,000/month)';
-            if (riskLevel === 'High' || revenue > 20000000) return 'Standard Risk Management ($1,500/month)';
-            return 'Basic FX Dashboard ($500/month)';
-        }
-
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
@@ -510,7 +459,7 @@
         }
 
         function calculateRisk() {
-            console.log('calculateRisk function called');
+            alert('Calculate function called!'); // Debug alert
             
             try {
                 // Get input values
@@ -522,51 +471,39 @@
                 const monthlyExp = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
                 const rate = parseFloat(document.getElementById('currentRate').value);
 
-                console.log('Input values:', {revenue, ar, ap, cash, monthlyRev, monthlyExp, rate});
-
-                // Validate inputs
-                if (!revenue || !rate || rate <= 0) {
-                    console.log('Invalid inputs detected');
-                    document.getElementById('riskSummary').innerHTML = `
-                        <div class="risk-level">Invalid Input</div>
-                        <div>Please check your revenue and exchange rate values</div>
-                    `;
-                    return;
-                }
-
-                // Calculate net exposure in USD - now includes net operational exposure
-                const netOperationalMXN = (monthlyRev - monthlyExp) * 3; // 3 months of net operations
+                // Simple calculation
+                const netOperationalMXN = (monthlyRev - monthlyExp) * 3;
                 const netExposureMXN = ar - ap + cash + netOperationalMXN;
                 const netExposureUSD = netExposureMXN / rate;
-                
-                console.log('Calculated exposure:', {netExposureMXN, netExposureUSD});
-                
-                // Calculate exposure as percentage of revenue
                 const exposurePercent = (Math.abs(netExposureUSD) / revenue) * 100;
 
-                // Calculate VaR
-                const varResults = calculateVaR(netExposureUSD);
-                const varAsPercent = (varResults.monthlyVaR / revenue) * 100;
+                // VaR calculation (simplified)
+                const volatility = 0.015;
+                const dailyVaR = Math.abs(netExposureUSD) * volatility * 1.65;
+                const monthlyVaR = dailyVaR * Math.sqrt(22);
 
-                // Determine risk level
-                const riskLevel = assessRiskLevel(exposurePercent, varAsPercent);
+                // Risk level
+                let riskLevel = 'Low';
+                if (exposurePercent > 15) riskLevel = 'Critical';
+                else if (exposurePercent > 10) riskLevel = 'High';
+                else if (exposurePercent > 5) riskLevel = 'Medium';
 
-                // Calculate scenarios
-                const scenarios = calculateScenarios(netExposureUSD);
-
-                console.log('Calculations complete:', {exposurePercent, riskLevel, varResults});
+                // Scenarios
+                const bullCase = netExposureUSD * 0.10;
+                const moderateBull = netExposureUSD * 0.05;
+                const moderateBear = netExposureUSD * -0.05;
+                const bearCase = netExposureUSD * -0.10;
 
                 // Update display
                 document.getElementById('netExposure').textContent = formatCurrency(netExposureUSD);
                 document.getElementById('exposurePercent').textContent = exposurePercent.toFixed(1) + '%';
-                document.getElementById('dailyVar').textContent = formatCurrency(varResults.dailyVaR);
-                document.getElementById('monthlyVar').textContent = formatCurrency(varResults.monthlyVaR);
+                document.getElementById('dailyVar').textContent = formatCurrency(dailyVaR);
+                document.getElementById('monthlyVar').textContent = formatCurrency(monthlyVaR);
 
-                // Update scenarios
-                document.getElementById('scenario1').textContent = formatCurrency(scenarios.bullCase);
-                document.getElementById('scenario2').textContent = formatCurrency(scenarios.moderateBull);
-                document.getElementById('scenario3').textContent = formatCurrency(scenarios.moderateBear);
-                document.getElementById('scenario4').textContent = formatCurrency(scenarios.bearCase);
+                document.getElementById('scenario1').textContent = formatCurrency(bullCase);
+                document.getElementById('scenario2').textContent = formatCurrency(moderateBull);
+                document.getElementById('scenario3').textContent = formatCurrency(moderateBear);
+                document.getElementById('scenario4').textContent = formatCurrency(bearCase);
 
                 // Update risk summary
                 const riskSummary = document.getElementById('riskSummary');
@@ -577,116 +514,25 @@
                 `;
 
                 // Show recommendation
-                const recommendationBox = document.getElementById('recommendationBox');
-                const recommendedService = recommendService(riskLevel, revenue);
+                let recommendedService = 'Basic FX Dashboard ($500/month)';
+                if (riskLevel === 'Critical' || revenue > 50000000) recommendedService = 'Premium AI Solutions ($3,000/month)';
+                else if (riskLevel === 'High' || revenue > 20000000) recommendedService = 'Standard Risk Management ($1,500/month)';
+
                 document.getElementById('recommendationText').innerHTML = `
                     <strong>Recommended:</strong> ${recommendedService}<br>
                     <small>Based on your ${formatCurrency(Math.abs(netExposureUSD))} exposure and ${riskLevel} risk level</small>
                 `;
-                recommendationBox.style.display = 'block';
+                document.getElementById('recommendationBox').style.display = 'block';
 
-                // Update chart
-                updateRiskChart(scenarios);
-
-                console.log('Display updated successfully');
+                alert('Calculation completed successfully!'); // Debug alert
 
             } catch (error) {
-                console.error('Calculation error:', error);
-                // Show fallback message if calculations fail
+                alert('Error: ' + error.message); // Debug alert
                 document.getElementById('riskSummary').innerHTML = `
-                    <div class="risk-level" style="color: #dc2626;">Calculation Error</div>
-                    <div>Error: ${error.message}. Please try again or contact support.</div>
+                    <div class="risk-level" style="color: #dc2626;">Error</div>
+                    <div>Calculation failed: ${error.message}</div>
                 `;
             }
-        }
-
-        function updateRiskChart(scenarios) {
-            const ctx = document.getElementById('riskChart').getContext('2d');
-            
-            if (riskChart) {
-                riskChart.destroy();
-            }
-
-            riskChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['MXN +10%', 'MXN +5%', 'Current', 'MXN -5%', 'MXN -10%'],
-                    datasets: [{
-                        label: 'P&L Impact (USD)',
-                        data: [scenarios.bullCase, scenarios.moderateBull, scenarios.current, scenarios.moderateBear, scenarios.bearCase],
-                        backgroundColor: [
-                            scenarios.bullCase >= 0 ? '#059669' : '#dc2626',
-                            scenarios.moderateBull >= 0 ? '#10b981' : '#f59e0b',
-                            '#6b7280',
-                            scenarios.moderateBear >= 0 ? '#10b981' : '#f59e0b',
-                            scenarios.bearCase >= 0 ? '#059669' : '#dc2626'
-                        ],
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'FX Rate Impact on P&L',
-                            color: '#000000'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return ' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Set some default values for demo and test calculation
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing calculator...');
-            
-            // Wait a bit more to ensure all elements are loaded
-            setTimeout(function() {
-                try {
-                    // Set default values
-                    document.getElementById('accountsReceivable').value = '5000000';
-                    document.getElementById('accountsPayable').value = '3000000';
-                    document.getElementById('cashPosition').value = '1000000';
-                    document.getElementById('monthlyRevenue').value = '2000000';
-                    document.getElementById('monthlyExpenses').value = '1200000';
-                    
-                    console.log('Default values set, running initial calculation...');
-                    
-                    // Run initial calculation
-                    calculateRisk();
-                    
-                    console.log('Initial calculation completed');
-                } catch (error) {
-                    console.error('Initialization error:', error);
-                    
-                    // Show error message to user
-                    document.getElementById('riskSummary').innerHTML = `
-                        <div class="risk-level" style="color: #dc2626;">Error Loading</div>
-                        <div>Please refresh the page or try clicking "Calculate FX Risk"</div>
-                    `;
-                }
-            }, 500);
-        });
-
-        // Add manual trigger for testing
-        function testCalculation() {
-            console.log('Manual test triggered');
-            calculateRisk();
         }
     </script>
 </body>
