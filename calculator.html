@@ -368,6 +368,22 @@
                     <input type="number" id="currentRate" value="18.45" step="0.01" oninput="calculateRisk()">
                     <div class="input-helper">Current exchange rate</div>
                 </div>
+
+                <button type="button" onclick="calculateRisk()" style="
+                    width: 100%;
+                    background: #008080;
+                    color: white;
+                    padding: 1rem 2rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-top: 1rem;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#006666'" onmouseout="this.style.background='#008080'">
+                    Calculate FX Risk
+                </button>
             </div>
 
             <div class="results-section">
@@ -494,6 +510,8 @@
         }
 
         function calculateRisk() {
+            console.log('calculateRisk function called');
+            
             try {
                 // Get input values
                 const revenue = parseFloat(document.getElementById('companyRevenue').value);
@@ -504,8 +522,15 @@
                 const monthlyExp = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
                 const rate = parseFloat(document.getElementById('currentRate').value);
 
+                console.log('Input values:', {revenue, ar, ap, cash, monthlyRev, monthlyExp, rate});
+
                 // Validate inputs
                 if (!revenue || !rate || rate <= 0) {
+                    console.log('Invalid inputs detected');
+                    document.getElementById('riskSummary').innerHTML = `
+                        <div class="risk-level">Invalid Input</div>
+                        <div>Please check your revenue and exchange rate values</div>
+                    `;
                     return;
                 }
 
@@ -513,6 +538,8 @@
                 const netOperationalMXN = (monthlyRev - monthlyExp) * 3; // 3 months of net operations
                 const netExposureMXN = ar - ap + cash + netOperationalMXN;
                 const netExposureUSD = netExposureMXN / rate;
+                
+                console.log('Calculated exposure:', {netExposureMXN, netExposureUSD});
                 
                 // Calculate exposure as percentage of revenue
                 const exposurePercent = (Math.abs(netExposureUSD) / revenue) * 100;
@@ -526,6 +553,8 @@
 
                 // Calculate scenarios
                 const scenarios = calculateScenarios(netExposureUSD);
+
+                console.log('Calculations complete:', {exposurePercent, riskLevel, varResults});
 
                 // Update display
                 document.getElementById('netExposure').textContent = formatCurrency(netExposureUSD);
@@ -559,12 +588,14 @@
                 // Update chart
                 updateRiskChart(scenarios);
 
+                console.log('Display updated successfully');
+
             } catch (error) {
                 console.error('Calculation error:', error);
                 // Show fallback message if calculations fail
                 document.getElementById('riskSummary').innerHTML = `
-                    <div class="risk-level">Error</div>
-                    <div>Please check your input values and try again</div>
+                    <div class="risk-level" style="color: #dc2626;">Calculation Error</div>
+                    <div>Error: ${error.message}. Please try again or contact support.</div>
                 `;
             }
         }
@@ -620,22 +651,43 @@
             });
         }
 
-        // Set some default values for demo
+        // Set some default values for demo and test calculation
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing calculator...');
+            
             // Wait a bit more to ensure all elements are loaded
             setTimeout(function() {
                 try {
+                    // Set default values
                     document.getElementById('accountsReceivable').value = '5000000';
                     document.getElementById('accountsPayable').value = '3000000';
                     document.getElementById('cashPosition').value = '1000000';
                     document.getElementById('monthlyRevenue').value = '2000000';
                     document.getElementById('monthlyExpenses').value = '1200000';
+                    
+                    console.log('Default values set, running initial calculation...');
+                    
+                    // Run initial calculation
                     calculateRisk();
+                    
+                    console.log('Initial calculation completed');
                 } catch (error) {
                     console.error('Initialization error:', error);
+                    
+                    // Show error message to user
+                    document.getElementById('riskSummary').innerHTML = `
+                        <div class="risk-level" style="color: #dc2626;">Error Loading</div>
+                        <div>Please refresh the page or try clicking "Calculate FX Risk"</div>
+                    `;
                 }
-            }, 100);
+            }, 500);
         });
+
+        // Add manual trigger for testing
+        function testCalculation() {
+            console.log('Manual test triggered');
+            calculateRisk();
+        }
     </script>
 </body>
 </html>
