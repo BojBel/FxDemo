@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FX Risk Management Solutions</title>
+    <title>Denar Financial - FX Risk Management Solutions</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
@@ -20,7 +20,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
             padding: 1rem 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -36,8 +36,16 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 1.5rem;
             font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
         }
 
         .nav-links {
@@ -54,11 +62,11 @@
         }
 
         .nav-links a:hover {
-            color: #93c5fd;
+            color: #00AAAA;
         }
 
         .hero {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
             padding: 4rem 0;
             text-align: center;
@@ -83,7 +91,7 @@
         }
 
         .cta-button {
-            background: #f59e0b;
+            background: #008080;
             color: white;
             padding: 1rem 2rem;
             border: none;
@@ -97,7 +105,7 @@
         }
 
         .cta-button:hover {
-            background: #d97706;
+            background: #006666;
         }
 
         .container {
@@ -127,7 +135,7 @@
         }
 
         .card h3 {
-            color: #1e3a8a;
+            color: #000000;
             margin-bottom: 1rem;
             font-size: 1.4rem;
         }
@@ -146,7 +154,7 @@
 
         .metric-value {
             font-weight: 600;
-            color: #1e3a8a;
+            color: #000000;
         }
 
         .risk-high { color: #dc2626; }
@@ -175,11 +183,11 @@
             background: #f8f9fa;
             padding: 2rem;
             border-radius: 12px;
-            border-left: 4px solid #3b82f6;
+            border-left: 4px solid #008080;
         }
 
         .service-card h4 {
-            color: #1e3a8a;
+            color: #000000;
             margin-bottom: 1rem;
         }
 
@@ -222,13 +230,24 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .logo img {
+                height: 32px;
+            }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <nav class="nav">
-            <div class="logo">FX Risk Solutions</div>
+            <div class="logo">
+                <img src="assets/images/logo.png" alt="Denar Financial">
+                Denar Financial
+            </div>
             <ul class="nav-links">
                 <li><a href="index.html">Dashboard</a></li>
                 <li><a href="#services">Services</a></li>
@@ -242,8 +261,8 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>Master Your FX Risk</h1>
-            <p>Professional FX Risk Management</p>
+            <h1>AI-Powered FX Risk Management</h1>
+            <p>Modern Treasury Solutions & Intelligent FX Strategies</p>
             <a href="#contact" class="cta-button">Get Your Free Assessment</a>
         </div>
     </section>
@@ -346,14 +365,15 @@
 
     <section id="services" class="services">
         <div class="container">
-            <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 2rem;">Our Services</h2>
+            <h2 style="text-align: center; color: #000000; margin-bottom: 2rem;">Our Services</h2>
             <div class="services-grid">
                 <div class="service-card">
                     <h4>Basic FX Dashboard</h4>
-                    <p>Perfect for small companies with simple FX exposure. Get monthly risk reports and basic hedging recommendations.</p>
+                    <p>Perfect for small companies with simple FX exposure. Get monthly risk reports and basic hedging recommendations powered by AI analytics.</p>
                     <ul style="margin: 1rem 0;">
                         <li>Custom Excel dashboard</li>
                         <li>Monthly risk reports</li>
+                        <li>AI-powered insights</li>
                         <li>Email support</li>
                     </ul>
                     <div class="price">$500/month</div>
@@ -361,25 +381,26 @@
                 
                 <div class="service-card">
                     <h4>Standard Risk Management</h4>
-                    <p>For companies with multiple entities or currencies. Includes weekly updates and quarterly strategy calls.</p>
+                    <p>For companies with multiple entities or currencies. Includes the Basic FX Dashboard services plus:</p>
                     <ul style="margin: 1rem 0;">
-                        <li>Includes the Basic FX Dashboard plus:</li>
-                            <li>Multi-entity tracking</li>
-                            <li>Weekly risk updates</li>
-                            <li>Quarterly strategy calls</li>
-                            <li>VaR analysis</li>
+                        <li>Multi-entity tracking</li>
+                        <li>Monthly risk updates</li>
+                        <li>AI forecasting models</li>
+                        <li>Quarterly strategy calls</li>
+                        <li>VaR Analysis</li>
                     </ul>
-                    <div class="price">$1,200/month</div>
+                    <div class="price">$1,500/month</div>
                 </div>
                 
                 <div class="service-card">
-                    <h4>Premium FX Solutions</h4>
-                    <p>Complete FX risk management for complex operations. Weekly calls and real-time alerts included.</p>
+                    <h4>Premium AI Solutions</h4>
+                    <p>Complete AI-Powered FX risk management for complex operations. Includes the Standard Risk Management services plus:</p>
                     <ul style="margin: 1rem 0;">
-                         <li>Includes Standard Risk Management plus:</li>
-                            <li>Complex operations support</li>
-                            <li>Monthly strategy calls</li>
-                            <li>Custom hedging strategies</li>
+                        <li>AI-powered automation</li>
+                        <li>AI training</li>
+                        <li>Advanced analysis</li>
+                        <li>Weekly strategy calls</li>
+                        <li>Custom hedging strategies</li>
                     </ul>
                     <div class="price">$3,000/month</div>
                 </div>
@@ -389,19 +410,19 @@
 
     <section id="contact" style="background: #f8f9fa; padding: 3rem 0;">
         <div class="container" style="text-align: center;">
-            <h2 style="color: #1e3a8a; margin-bottom: 1rem;">Ready to Manage Your FX Risk?</h2>
-            <p style="margin-bottom: 2rem; font-size: 1.1rem;">Get your FREE Risk Assessment.</p>
-            <a href="calculator.html" class="cta-button">Start Risk Calculator</a>
+            <h2 style="color: #000000; margin-bottom: 1rem;">Ready to Optimize Your FX Risk?</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">Get your FREE AI-Powered risk assessment and see how much you could save.</p>
+            <a href="calculator.html" class="cta-button">Start Risk Assessment</a>
             <div style="margin-top: 2rem;">
-                <p><strong>Contact:</strong> consulting@denarfinancial.com
+                <p><strong>Contact:</strong> consulting@denarfinancial.com</p>
             </div>
         </div>
     </section>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 FX Risk Solutions. Professional foreign exchange risk management consulting.</p>
-            <p>Contact: info@fxrisksolutions.com | (555) 123-4567</p>
+            <p>&copy; 2025 Denar Financial. AI-Powered Treasury & Financial Planning</p>
+            <p>Contact: consulting@denarfinancial.com</p>
         </div>
     </footer>
 
@@ -415,8 +436,8 @@
                 datasets: [{
                     label: 'USD/MXN Rate',
                     data: [18.2, 18.5, 18.1, 18.8, 18.4, 18.45],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: '#008080',
+                    backgroundColor: 'rgba(0, 128, 128, 0.1)',
                     tension: 0.3
                 }]
             },
@@ -489,7 +510,7 @@
                 labels: ['AR', 'AP', 'Cash', 'Other'],
                 datasets: [{
                     data: [18.5, 12.3, 3.1, 2.1],
-                    backgroundColor: ['#3b82f6', '#f59e0b', '#059669', '#6b7280']
+                    backgroundColor: ['#008080', '#f59e0b', '#059669', '#6b7280']
                 }]
             },
             options: {
