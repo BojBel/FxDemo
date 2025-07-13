@@ -305,7 +305,7 @@
         </nav>
     </header>
 
-    <div class="container">
+            <div class="container">
         <h1 class="page-title">FX Risk Calculator</h1>
         <p class="subtitle">Get an instant assessment of your foreign exchange risk exposure</p>
         <p class="subtitle">(Mexican Peso exposure used for Demo purposes)</p>
@@ -437,13 +437,98 @@
                     <div class="recommendation-title">Recommended Solution</div>
                     <div id="recommendationText"></div>
                 </div>
+            </div>
+        </div>
 
-                <div class="cta-section">
-                    <h4>Ready to Protect Your Business?</h4>
-                    <p>Get a detailed analysis and custom hedging strategy from our FX experts</p>
-                    <a href="mailto:consulting@denarfinancial.com?subject=FX Risk Assessment Request" class="cta-button">
-                        Schedule Free Consultation
-                    </a>
+        <!-- ROI Calculator Section -->
+        <div style="background: #f8f9fa; padding: 3rem 0; margin-top: 4rem;">
+            <div class="container">
+                <h2 style="text-align: center; color: #000000; margin-bottom: 1rem; font-size: 2rem;">ROI Calculator</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 3rem; font-size: 1.1rem;">See how much our FX risk management service could save your business</p>
+                
+                <div class="calculator-layout">
+                    <div class="input-section">
+                        <h3 class="section-title">ROI Analysis</h3>
+                        
+                        <div class="form-group">
+                            <label for="roiExposure">Annual FX Exposure (USD)</label>
+                            <input type="number" id="roiExposure" value="487805" step="1000" oninput="calculateROI()">
+                            <div class="input-helper">Will auto-populate from risk calculator above</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="currentHedging">Current Hedging Strategy</label>
+                            <select id="currentHedging" onchange="calculateROI()">
+                                <option value="0">No hedging</option>
+                                <option value="25">Basic hedging (25% coverage)</option>
+                                <option value="50">Moderate hedging (50% coverage)</option>
+                                <option value="75">Advanced hedging (75% coverage)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="riskTolerance">Risk Tolerance</label>
+                            <select id="riskTolerance" onchange="calculateROI()">
+                                <option value="conservative">Conservative (expect 5-8% annual volatility)</option>
+                                <option value="moderate" selected>Moderate (expect 8-12% annual volatility)</option>
+                                <option value="aggressive">Aggressive (expect 12-20% annual volatility)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serviceTier">Denar Financial Service</label>
+                            <select id="serviceTier" onchange="calculateROI()">
+                                <option value="500">Basic FX Dashboard ($500/month)</option>
+                                <option value="1500" selected>Standard Risk Management ($1,500/month)</option>
+                                <option value="3000">Premium AI Solutions ($3,000/month)</option>
+                            </select>
+                        </div>
+
+                        <button type="button" class="calculate-btn" onclick="calculateROI()">
+                            Calculate ROI
+                        </button>
+                    </div>
+
+                    <div class="results-section">
+                        <h3 class="section-title">ROI Analysis Results</h3>
+                        
+                        <div id="roiSummary" class="risk-summary">
+                            <div class="risk-level">Click "Calculate ROI" to see savings potential</div>
+                            <div>See how much our service could save your business annually</div>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-label">Annual Risk Exposure</div>
+                                <div class="metric-value" id="annualRisk">$0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Service Cost (Annual)</div>
+                                <div class="metric-value" id="serviceCost">$0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Estimated Annual Savings</div>
+                                <div class="metric-value" id="annualSavings">$0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">ROI Percentage</div>
+                                <div class="metric-value" id="roiPercent">0%</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+                            <h4 style="color: #059669; margin-bottom: 1rem;">Investment Payback</h4>
+                            <div id="paybackAnalysis">Calculate ROI to see payback timeline</div>
+                        </div>
+
+                        <div class="cta-section">
+                            <h4>Ready to Start Saving?</h4>
+                            <p>Get a detailed proposal based on your specific FX risk profile</p>
+                            <a href="mailto:consulting@denarfinancial.com?subject=ROI Analysis Request" class="cta-button">
+                                Request Custom Proposal
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
