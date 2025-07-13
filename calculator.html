@@ -637,12 +637,12 @@
                         <li>Net annual savings: $${netSavings.toLocaleString()}</li>
                     </ul>
                     
-                    <div style="background: ${netSavings > 0 ? '#e8f5e8' : '#fff3cd'}; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <div style="background: ${netSavings > 0 ? '#e8f5e8' : '#f0f8ff'}; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p><strong>ROI: ${roi.toFixed(0)}%</strong></p>
                         <p><strong>Payback period: ${paybackDays < 365 ? paybackDays.toFixed(0) + ' days' : 'More than 1 year'}</strong></p>
                         ${netSavings > 0 ? 
                             '<p style="color: #155724;"><strong>✓ Positive ROI - Service recommended</strong></p>' : 
-                            '<p style="color: #856404;"><strong>⚠ Consider higher service tier or improve current hedging</strong></p>'
+                            '<p style="color: #1a5490;"><strong>💡 High-risk exposure requires strategic approach - Let Denar Financial design a comprehensive risk management plan using our Premium AI Solutions to optimize your hedging strategy and minimize potential losses.</strong></p>'
                         }
                     </div>
                     
