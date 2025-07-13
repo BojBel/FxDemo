@@ -182,6 +182,72 @@
         .risk-high { background: #f8d7da; color: #721c24; }
         .risk-critical { background: #f5c6cb; color: #721c24; }
 
+        /* Lead Capture Styles */
+        .lead-capture {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border: 2px solid #008080;
+            text-align: center;
+        }
+
+        .lead-capture h3 {
+            color: #000000;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .lead-capture p {
+            color: #374151;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .results-summary {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #008080;
+            text-align: left;
+        }
+
+        .results-summary h4 {
+            color: #000000;
+            margin-bottom: 1rem;
+        }
+
+        .results-summary p {
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .airtable-btn {
+            display: inline-block;
+            background: #008080;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .airtable-btn:hover {
+            background: #006666;
+        }
+
+        .form-note {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
         @media (max-width: 768px) {
             .nav {
                 flex-direction: column;
@@ -286,6 +352,28 @@
 
             <div id="riskResults" class="results" style="display: none;">
                 <!-- Risk results will appear here -->
+            </div>
+
+            <!-- Lead Capture Section -->
+            <div id="leadCapture" class="lead-capture" style="display: none;">
+                <h3>📊 Get Your Detailed 10-Page FX Risk Report</h3>
+                <p>Your results show <strong><span id="riskLevelDisplay"></span></strong> risk level. Get a comprehensive PDF analysis with personalized recommendations based on your specific risk profile.</p>
+                
+                <div class="results-summary">
+                    <h4>Your Assessment Summary:</h4>
+                    <p><strong>Risk Level:</strong> <span id="summaryRiskLevel"></span></p>
+                    <p><strong>Total FX Exposure:</strong> $<span id="summaryExposure"></span></p>
+                    <p><strong>Monthly Value at Risk:</strong> $<span id="summaryVaR"></span></p>
+                    <p><strong>Recommended Service:</strong> <span id="summaryService"></span></p>
+                </div>
+                
+                <a href="https://airtable.com/appn7guymXXzmpvly/pagKYzcm4hRbPJhGh/form" 
+                   target="_blank" 
+                   class="airtable-btn">
+                    📧 Get My Detailed FX Risk Report
+                </a>
+                
+                <p class="form-note">Opens in new tab • Takes 2 minutes • Receive report within 24 hours</p>
             </div>
         </section>
 
@@ -427,6 +515,9 @@
                 `;
                 resultsDiv.style.display = 'block';
 
+                // Show lead capture with results summary
+                showLeadCapture(riskLevel, Math.abs(netExposureUSD), monthlyVaR, recommendedService);
+
                 // Auto-populate ROI calculator with the actual exposure
                 document.getElementById('roiExposure').value = Math.abs(netExposureUSD).toFixed(0);
                 
@@ -437,6 +528,27 @@
                 console.error('Risk calculation error:', error);
                 alert('Please check your inputs and try again.');
             }
+        }
+
+        function showLeadCapture(riskLevel, exposureUSD, monthlyVaR, recommendedService) {
+            // Show the lead capture section
+            const leadCaptureDiv = document.getElementById('leadCapture');
+            leadCaptureDiv.style.display = 'block';
+            
+            // Populate the summary
+            document.getElementById('riskLevelDisplay').textContent = riskLevel;
+            document.getElementById('summaryRiskLevel').textContent = riskLevel;
+            document.getElementById('summaryExposure').textContent = exposureUSD.toLocaleString();
+            document.getElementById('summaryVaR').textContent = monthlyVaR.toLocaleString();
+            document.getElementById('summaryService').textContent = recommendedService;
+            
+            // Scroll to the form after a brief delay
+            setTimeout(() => {
+                leadCaptureDiv.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }, 500);
         }
 
         function calculateROI() {
