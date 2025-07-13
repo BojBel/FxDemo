@@ -305,7 +305,7 @@
         </nav>
     </header>
 
-            <div class="container">
+    <div class="container">
         <h1 class="page-title">FX Risk Calculator</h1>
         <p class="subtitle">Get an instant assessment of your foreign exchange risk exposure</p>
         <p class="subtitle">(Mexican Peso exposure used for Demo purposes)</p>
@@ -610,11 +610,100 @@
                 `;
                 document.getElementById('recommendationBox').style.display = 'block';
 
+                // Auto-populate ROI calculator and highlight the field
+                const absExposure = Math.abs(netExposureUSD);
+                const roiField = document.getElementById('roiExposure');
+                roiField.value = Math.round(absExposure);
+                
+                // Visual feedback
+                roiField.style.backgroundColor = '#e6fffa';
+                roiField.style.border = '2px solid #008080';
+                setTimeout(() => {
+                    roiField.style.backgroundColor = '';
+                    roiField.style.border = '2px solid #e5e7eb';
+                }, 2000);
+
+                alert('FX exposure of $' + Math.round(absExposure).toLocaleString() + ' copied to ROI calculator!');
+                
+                // Auto-calculate ROI
+                calculateROI();
+
                 alert('Calculation completed successfully!'); // Debug alert
 
             } catch (error) {
                 alert('Error: ' + error.message); // Debug alert
                 document.getElementById('riskSummary').innerHTML = `
+                    <div class="risk-level" style="color: #dc2626;">Error</div>
+                    <div>Calculation failed: ${error.message}</div>
+                `;
+            }
+        }
+
+        function calculateROI() {
+            alert('ROI function called!'); // Debug alert
+            
+            try {
+                // Get input values
+                const exposure = parseFloat(document.getElementById('roiExposure').value) || 0;
+                const hedging = parseFloat(document.getElementById('currentHedging').value) || 0;
+                const serviceCost = parseFloat(document.getElementById('serviceTier').value) || 1500;
+                
+                alert('ROI inputs: Exposure=' + exposure + ', Hedging=' + hedging + '%, Service=$' + serviceCost);
+                
+                if (exposure === 0) {
+                    document.getElementById('roiSummary').innerHTML = `
+                        <div class="risk-level">Enter Exposure</div>
+                        <div>Please enter your FX exposure amount above</div>
+                    `;
+                    return;
+                }
+                
+                // Simple calculations
+                const annualRisk = exposure * 0.10; // 10% volatility
+                const currentRisk = annualRisk * (1 - (hedging / 100));
+                const ourReduction = currentRisk * 0.7; // We reduce 70% of unhedged risk
+                const annualCost = serviceCost * 12;
+                const savings = ourReduction - annualCost;
+                const roi = Math.max(0, (savings / annualCost) * 100);
+                
+                alert('Calculated: Risk=$' + Math.round(currentRisk) + ', Savings=$' + Math.round(savings));
+                
+                // Update display
+                document.getElementById('annualRisk').textContent = '$' + Math.round(currentRisk).toLocaleString();
+                document.getElementById('serviceCost').textContent = '$' + Math.round(annualCost).toLocaleString();
+                document.getElementById('annualSavings').textContent = '$' + Math.round(Math.max(0, savings)).toLocaleString();
+                document.getElementById('roiPercent').textContent = Math.round(roi) + '%';
+                
+                // Update summary
+                const summary = document.getElementById('roiSummary');
+                if (savings > 0) {
+                    summary.className = 'risk-summary risk-low';
+                    summary.innerHTML = `
+                        <div class="risk-level">POSITIVE ROI</div>
+                        <div>Our service could save you $${Math.round(savings).toLocaleString()} annually</div>
+                    `;
+                } else {
+                    summary.className = 'risk-summary risk-medium';
+                    summary.innerHTML = `
+                        <div class="risk-level">COST vs BENEFIT</div>
+                        <div>Service provides risk management value beyond immediate cost savings</div>
+                    `;
+                }
+                
+                // Update payback
+                const payback = document.getElementById('paybackAnalysis');
+                if (savings > 0) {
+                    const months = Math.ceil(annualCost / (ourReduction / 12));
+                    payback.innerHTML = `<strong>Service pays for itself in ${months} months</strong><br>Annual risk reduction: $${Math.round(ourReduction).toLocaleString()}`;
+                } else {
+                    payback.innerHTML = `<strong>Risk Management Investment</strong><br>Provides stability and peace of mind beyond direct cost savings`;
+                }
+                
+                alert('ROI calculation completed!'); // Debug
+                
+            } catch (error) {
+                alert('ROI Error: ' + error.message); // Debug
+                document.getElementById('roiSummary').innerHTML = `
                     <div class="risk-level" style="color: #dc2626;">Error</div>
                     <div>Calculation failed: ${error.message}</div>
                 `;
