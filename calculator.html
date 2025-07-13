@@ -398,14 +398,14 @@
                     <h3>Your FX Risk Assessment</h3>
                     <div class="risk-level ${riskClass}">Risk Level: ${riskLevel}</div>
                     
-                    <p><strong>Net FX Exposure:</strong> $${Math.abs(netExposureUSD).toLocaleString()} USD</p>
+                    <p><strong>Net FX Exposure:</strong> ${Math.abs(netExposureUSD).toLocaleString()} USD</p>
                     <p><strong>Exposure as % of Revenue:</strong> ${exposurePercent.toFixed(1)}%</p>
-                    <p><strong>Monthly Value at Risk (95%):</strong> $${monthlyVaR.toLocaleString()}</p>
+                    <p><strong>Monthly Value at Risk (95%):</strong> ${monthlyVaR.toLocaleString()}</p>
                     
                     <h4>Potential Impact Scenarios:</h4>
                     <ul>
                         ${Object.entries(scenarios).map(([scenario, impact]) => 
-                            `<li>${scenario}: ${impact >= 0 ? '+' : ''}$${Math.abs(impact).toLocaleString()}</li>`
+                            `<li>${scenario}: ${impact >= 0 ? '+' : ''}${Math.abs(impact).toLocaleString()}</li>`
                         ).join('')}
                     </ul>
                     
@@ -414,14 +414,14 @@
                 `;
                 resultsDiv.style.display = 'block';
 
-                // Auto-populate ROI calculator
+                // Auto-populate ROI calculator with the actual exposure
                 document.getElementById('roiExposure').value = Math.abs(netExposureUSD).toFixed(0);
                 
-                // Auto-calculate ROI
+                // Auto-calculate ROI after a brief delay
                 setTimeout(calculateROI, 500);
 
             } catch (error) {
-                alert('Error calculating risk: ' + error.message);
+                console.error('Risk calculation error:', error);
             }
         }
 
