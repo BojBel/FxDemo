@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denar Financial - AI Powered Treasury & FX Risk Management</title>
+    <title>Denar Financial - FX Risk Management Solutions</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
@@ -13,27 +13,26 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
+            background: #f8f9fa;
         }
 
         .header {
-            background: #000000;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
             padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .nav {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 1rem;
             position: relative;
         }
 
@@ -52,32 +51,21 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
             list-style: none;
+            gap: 2rem;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: color 0.3s;
         }
 
         .nav-links a:hover {
-            color: #008080;
+            color: #00AAAA;
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
@@ -85,32 +73,25 @@
             text-align: center;
         }
 
-        .container {
-            max-width: 1200px;
+        .hero-content {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 1rem;
         }
 
         .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .hero h2 {
             font-size: 3rem;
             margin-bottom: 1rem;
             font-weight: 700;
         }
 
-        .hero .subtitle {
-            font-size: 1.3rem;
+        .hero p {
+            font-size: 1.2rem;
             margin-bottom: 2rem;
             opacity: 0.9;
         }
 
         .cta-button {
-            display: inline-block;
             background: #008080;
             color: white;
             padding: 1rem 2rem;
@@ -118,210 +99,118 @@
             border-radius: 8px;
             font-size: 1.1rem;
             font-weight: 600;
-            text-decoration: none;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .cta-button:hover {
             background: #006666;
         }
 
-        /* Credibility Section */
-        .credibility {
-            background: #f8f9fa;
-            padding: 3rem 0;
-        }
-
-        .credibility-content {
-            max-width: 800px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
-        }
-
-        .credibility h2 {
-            color: #000000;
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-        }
-
-        .credibility p {
-            color: #374151;
-            font-size: 1.1rem;
-            line-height: 1.7;
-        }
-
-        /* Demo Note */
-        .demo-note {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            font-size: 0.9rem;
-            margin: 2rem 0;
-        }
-
-        /* Dashboard Section */
-        .dashboard {
-            background: #ffffff;
-            padding: 3rem 0;
-        }
-
-        .dashboard h2 {
-            text-align: center;
-            color: #000000;
-            font-size: 2rem;
-            margin-bottom: 2rem;
+            padding: 0 1rem;
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            margin-bottom: 3rem;
+            margin: 3rem 0;
         }
 
-        .dashboard-card {
+        .card {
             background: white;
-            padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-            text-align: center;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .dashboard-card h3 {
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
             color: #000000;
             margin-bottom: 1rem;
-            font-size: 1.1rem;
+            font-size: 1.4rem;
         }
 
-        .dashboard-card .metric {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #008080;
-            margin-bottom: 0.5rem;
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .dashboard-card .description {
-            color: #666;
-            font-size: 0.9rem;
+        .metric:last-child {
+            border-bottom: none;
         }
 
-        /* Charts */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .chart-card h4 {
+        .metric-value {
+            font-weight: 600;
             color: #000000;
-            margin-bottom: 1rem;
-            text-align: center;
         }
 
-        /* Services Section */
+        .risk-high { color: #dc2626; }
+        .risk-medium { color: #f59e0b; }
+        .risk-low { color: #059669; }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+
         .services {
-            background: #f8f9fa;
+            background: white;
             padding: 4rem 0;
-        }
-
-        .services h2 {
-            text-align: center;
-            color: #000000;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
+            margin: 3rem 0;
         }
 
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
+            margin: 2rem 0;
         }
 
         .service-card {
-            background: white;
+            background: #f8f9fa;
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #008080;
-            text-align: center;
+            border-left: 4px solid #008080;
         }
 
-        .service-card h3 {
+        .service-card h4 {
             color: #000000;
             margin-bottom: 1rem;
+        }
+
+        .price {
             font-size: 1.5rem;
-        }
-
-        .service-card p {
-            color: #666;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .service-card ul {
-            text-align: left;
-            margin: 1rem 0;
-            color: #333;
-        }
-
-        .service-card .price {
-            font-size: 2rem;
             font-weight: bold;
-            color: #008080;
+            color: #059669;
             margin-top: 1rem;
         }
 
-        /* Contact Section */
-        .contact {
-            background: #000000;
+        .footer {
+            background: #1f2937;
             color: white;
-            padding: 4rem 0;
+            padding: 2rem 0;
             text-align: center;
         }
 
-        .contact h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        .mobile-menu {
+            display: none;
         }
 
-        .contact p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .contact-info {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-top: 2rem;
-        }
-
-        .contact-item {
-            text-align: center;
-        }
-
-        .contact-item h4 {
-            color: #008080;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Mobile Styles */
         @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-
             .nav-links {
                 display: none;
                 position: absolute;
@@ -349,26 +238,31 @@
                 padding: 0.75rem;
                 border-bottom: 1px solid #333;
             }
-
-            .hero h1, .hero h2 {
+            
+            .mobile-menu {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            
+            .hero h1 {
                 font-size: 2rem;
             }
-
-            .contact-info {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
+            
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
 
-            .charts-grid {
-                grid-template-columns: 1fr;
+            .logo {
+                font-size: 1.2rem;
             }
 
-            .services-grid {
-                grid-template-columns: 1fr;
+            .logo img {
+                height: 32px;
             }
         }
     </style>
@@ -380,7 +274,6 @@
                 <img src="assets/images/logo.png" alt="Denar Financial">
                 Denar Financial
             </div>
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Dashboard</a></li>
                 <li><a href="#services">Services</a></li>
@@ -388,87 +281,136 @@
                 <li><a href="reports.html">Reports</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <button class="mobile-menu" onclick="toggleMobileMenu()">☰</button>
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
+        <div class="hero-content">
             <h1>AI Powered Treasury</h1>
-            <h2>FX Risk Management</h2>
-            <p class="subtitle">Modern Treasury Solutions & Intelligent FX Strategies</p>
+            <h2 style="font-size: 3rem; font-weight: 700; margin-bottom: 1rem;">FX Risk Management</h2>
+            <p>Modern Treasury Solutions & Intelligent FX Strategies</p>
             <a href="#contact" class="cta-button">Get Your Free Assessment</a>
         </div>
     </section>
 
-    <!-- Credibility Section -->
-    <section class="credibility">
+    <section style="background: #f8f9fa; padding: 3rem 0;">
         <div class="container">
-            <div class="credibility-content">
-                <h2>Built by Treasury & FP&A Executives Who've Been in Your Shoes</h2>
-                <p>Our AI powered approach is built by Treasury and FP&A executives who understand the daily reality of managing financial risk. We've been in your shoes - scrambling to explain unexpected FX hits during month-end close, watching currency swings eat into profit margins, and trying to forecast with volatile exchange rates. That's why we built the FX risk platform we wished we'd had - one that turns complex data into clear decisions without needing a full treasury department.</p>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <h2 style="color: #000000; font-size: 1.6rem; margin-bottom: 1rem;">Built by Treasury & FP&A Executives Who've Been in Your Shoes</h2>
+                <p style="color: #374151; font-size: 1.1rem; line-height: 1.7;">
+                    Our AI powered approach is built by Treasury and FP&A executives who understand the daily reality of managing financial risk. We've been in your shoes - scrambling to explain unexpected FX hits during month-end close, watching currency swings eat into profit margins, and trying to forecast with volatile exchange rates. That's why we built the FX risk platform we wished we'd had - one that turns complex data into clear decisions without needing a full treasury department.
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- Demo Note -->
-    <div class="demo-note">
-        <p>Dashboard shows USD/MXN exposure for demonstration purposes</p>
-    </div>
-
-    <!-- Dashboard Section -->
-    <section class="dashboard" id="dashboard">
-        <div class="container">
-            <h2>Live FX Risk Dashboard</h2>
-            
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h3>Current USD/MXN Rate</h3>
-                    <div class="metric" id="current-rate">18.45</div>
-                    <div class="description">Live market rate</div>
+    <section id="dashboard" class="container">
+        <p style="text-align: center; color: #6b7280; font-size: 0.9rem; margin-bottom: 2rem;">
+            <em>Dashboard shows USD/MXN exposure for demonstration purposes</em>
+        </p>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Current FX Exposure</h3>
+                <div class="metric">
+                    <span>USD/MXN Rate</span>
+                    <span class="metric-value" id="currentRate">18.45</span>
                 </div>
-                
-                <div class="dashboard-card">
-                    <h3>Monthly VaR (95%)</h3>
-                    <div class="metric" id="monthly-var">$56,000</div>
-                    <div class="description">Value at Risk</div>
+                <div class="metric">
+                    <span>Daily Change</span>
+                    <span class="metric-value risk-medium" id="dailyChange">-0.23%</span>
                 </div>
-                
-                <div class="dashboard-card">
-                    <h3>FX Exposure</h3>
-                    <div class="metric" id="exposure-percent">3.2%</div>
-                    <div class="description">Of annual revenue</div>
+                <div class="metric">
+                    <span>Total Exposure (USD)</span>
+                    <span class="metric-value" id="totalExposure">$2.4M</span>
                 </div>
-                
-                <div class="dashboard-card">
-                    <h3>Recommendation</h3>
-                    <div class="metric" id="recommendation" style="font-size: 1rem;">Standard Risk Management</div>
-                    <div class="description">Based on risk profile</div>
+                <div class="metric">
+                    <span>Risk Level</span>
+                    <span class="metric-value risk-high">High</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="exposureChart"></canvas>
                 </div>
             </div>
 
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h4>USD/MXN Exchange Rate (7 Days)</h4>
-                    <canvas id="rateChart" width="400" height="200"></canvas>
+            <div class="card">
+                <h3>Value at Risk (VaR) Analysis</h3>
+                <div class="metric">
+                    <span>1-Day VaR (95%)</span>
+                    <span class="metric-value risk-high">$45,000</span>
                 </div>
-                
-                <div class="chart-card">
-                    <h4>Risk Scenarios</h4>
-                    <canvas id="scenarioChart" width="400" height="200"></canvas>
+                <div class="metric">
+                    <span>Monthly VaR</span>
+                    <span class="metric-value risk-high">$180,000</span>
+                </div>
+                <div class="metric">
+                    <span>Worst Case (99%)</span>
+                    <span class="metric-value risk-high">$280,000</span>
+                </div>
+                <div class="metric">
+                    <span>Last Update</span>
+                    <span class="metric-value">Today 9:00 AM</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="varChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>P&L Impact Simulation</h3>
+                <div class="metric">
+                    <span>If MXN weakens 5%</span>
+                    <span class="metric-value risk-high">-$120,000</span>
+                </div>
+                <div class="metric">
+                    <span>If MXN strengthens 5%</span>
+                    <span class="metric-value risk-low">+$120,000</span>
+                </div>
+                <div class="metric">
+                    <span>Hedged Scenario (-5%)</span>
+                    <span class="metric-value risk-medium">-$15,000</span>
+                </div>
+                <div class="metric">
+                    <span>Hedge Effectiveness</span>
+                    <span class="metric-value risk-low">87.5%</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="plChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Portfolio Summary</h3>
+                <div class="metric">
+                    <span>Accounts Receivable</span>
+                    <span class="metric-value">MXN 18.5M</span>
+                </div>
+                <div class="metric">
+                    <span>Accounts Payable</span>
+                    <span class="metric-value">MXN 12.3M</span>
+                </div>
+                <div class="metric">
+                    <span>Net Exposure</span>
+                    <span class="metric-value">MXN 6.2M</span>
+                </div>
+                <div class="metric">
+                    <span>Cash Position</span>
+                    <span class="metric-value">MXN 3.1M</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="portfolioChart"></canvas>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section class="services" id="services">
+    <section id="services" class="services">
         <div class="container">
-            <h2>Our Services</h2>
+            <h2 style="text-align: center; color: #000000; margin-bottom: 2rem;">Our Services</h2>
             <div class="services-grid">
                 <div class="service-card">
-                    <h3>Basic FX Dashboard</h3>
-                    <p>Perfect for small companies with simple FX exposure. Get monthly risk reports and basic hedging recommendations powered by AI analytics.</p>
+                    <h4>Basic FX Dashboard</h4>
+                    <p>Perfect for small companies with simple FX exposure. Get monthly risk reports and basic recommendations powered by AI analytics.</p>
                     <ul style="margin: 1rem 0;">
                         <li>Custom Excel dashboard</li>
                         <li>Monthly risk reports</li>
@@ -477,31 +419,30 @@
                     </ul>
                     <div class="price">$500/month</div>
                 </div>
-
+                
                 <div class="service-card">
-                    <h3>Standard Risk Management</h3>
-                    <p>For companies with multiple entities or currencies. Includes the Basic FX Dashboard services plus:</p>
+                    <h4>Standard Risk Management</h4>
+                    <p>For companies with multiple entities and/or currencies. Includes weekly updates, FX forecasting, and quarterly strategy calls.</p>
                     <ul style="margin: 1rem 0;">
                         <li>Everything from Basic plus:</li>
                         <li>Multi-entity tracking</li>
                         <li>Weekly risk updates</li>
                         <li>AI forecasting models</li>
                         <li>Quarterly strategy calls</li>
-                        <li>VaR Analysis</li>
+                        <li>VaR analysis</li>
                     </ul>
                     <div class="price">$1,500/month</div>
                 </div>
-
+                
                 <div class="service-card">
-                    <h3>Premium AI Solutions</h3>
-                    <p>Complete AI powered FX risk management for complex operations. Includes the Standard Risk Management services plus:</p>
+                    <h4>Premium AI Solutions</h4>
+                    <p>Complete AI Powered FX risk management for complex operations. Real-time information analysis, predictive analytics, and weekly strategy calls.</p>
                     <ul style="margin: 1rem 0;">
                         <li>Everything from Standard plus:</li>
                         <li>AI powered automation</li>
                         <li>Real-time analysis</li>
                         <li>Weekly strategy calls</li>
-                        <li>Advanced scenario modeling</li>
-                        <li>Employee AI training (prompt engineering, basic analytics)</li>
+                        <li>Employee AI training</li>
                     </ul>
                     <div class="price">$3,000/month</div>
                 </div>
@@ -509,25 +450,23 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <h2>Ready to Get Started?</h2>
-            <p>Take control of your FX risk with AI powered solutions</p>
-            <a href="mailto:consulting@denarfinancial.com" class="cta-button">Get Your Free Assessment</a>
-            
-            <div class="contact-info">
-                <div class="contact-item">
-                    <h4>Email</h4>
-                    <p>consulting@denarfinancial.com</p>
-                </div>
-                <div class="contact-item">
-                    <h4>Phone</h4>
-                    <p>(555) 123-4567</p>
-                </div>
+    <section id="contact" style="background: #f8f9fa; padding: 3rem 0;">
+        <div class="container" style="text-align: center;">
+            <h2 style="color: #000000; margin-bottom: 1rem;">Ready to Optimize Your FX Risk?</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">Get your free AI powered risk assessment and see how much you could save.</p>
+            <a href="calculator.html" class="cta-button">Start Risk Calculator</a>
+            <div style="margin-top: 2rem;">
+                <p><strong>Contact:</strong> consulting@denarfinancial.com</p>
             </div>
         </div>
     </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Denar Financial. AI Powered Treasury & Financial Planning Solutions.</p>
+            <p>Contact: consulting@denarfinancial.com</p>
+        </div>
+    </footer>
 
     <script>
         // Mobile menu toggle function
@@ -544,95 +483,112 @@
                     document.getElementById('navLinks').classList.remove('active');
                 });
             });
-
-            // Initialize charts and dashboard
-            initializeCharts();
-            setInterval(updateDashboard, 10000);
-            updateDashboard();
         });
 
-        function updateDashboard() {
-            // Update USD/MXN rate with small random variation
-            const baseRate = 18.45;
-            const variation = (Math.random() - 0.5) * 0.1;
-            const newRate = (baseRate + variation).toFixed(2);
-            
-            document.getElementById('current-rate').textContent = newRate;
-            
-            // Update other metrics with small variations
-            updateMetric('monthly-var', 56000, 2000);
-            updateMetric('exposure-percent', 3.2, 0.2);
-            updateMetric('recommendation', ['Standard Risk Management', 'Basic FX Dashboard', 'Premium AI Solutions']);
-        }
-
-        function updateMetric(elementId, baseValue, variation) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            if (Array.isArray(baseValue)) {
-                const randomIndex = Math.floor(Math.random() * baseValue.length);
-                element.textContent = baseValue[randomIndex];
-            } else {
-                const randomVariation = (Math.random() - 0.5) * variation;
-                const newValue = baseValue + randomVariation;
-                
-                if (elementId.includes('percent')) {
-                    element.textContent = newValue.toFixed(1) + '%';
-                } else {
-                    element.textContent = '$' + Math.round(newValue).toLocaleString();
+        // Initialize charts with sample data
+        const ctx1 = document.getElementById('exposureChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'USD/MXN Rate',
+                    data: [18.2, 18.5, 18.1, 18.8, 18.4, 18.45],
+                    borderColor: '#008080',
+                    backgroundColor: 'rgba(0, 128, 128, 0.1)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 17.8,
+                        max: 19.0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 }
             }
-        }
+        });
 
-        function initializeCharts() {
-            // Exchange Rate Chart
-            const rateCtx = document.getElementById('rateChart');
-            if (rateCtx) {
-                new Chart(rateCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'USD/MXN Rate',
-                            data: [18.42, 18.38, 18.45, 18.51, 18.47, 18.43, 18.45],
-                            borderColor: '#008080',
-                            backgroundColor: 'rgba(0, 128, 128, 0.1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: false, min: 18.3, max: 18.6 }
-                        }
+        const ctx2 = document.getElementById('varChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['1-Day', '1-Week', '1-Month', '3-Month'],
+                datasets: [{
+                    label: 'VaR (USD 000s)',
+                    data: [45, 95, 180, 420],
+                    backgroundColor: ['#dc2626', '#f59e0b', '#f59e0b', '#dc2626']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     }
-                });
+                }
             }
+        });
 
-            // Scenario Chart
-            const scenarioCtx = document.getElementById('scenarioChart');
-            if (scenarioCtx) {
-                new Chart(scenarioCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Peso +10%', 'Peso +5%', 'Current', 'Peso -5%', 'Peso -10%'],
-                        datasets: [{
-                            label: 'P&L Impact ($K)',
-                            data: [48, 24, 0, -24, -48],
-                            backgroundColor: ['#10B981', '#34D399', '#6B7280', '#F87171', '#EF4444']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
+        const ctx3 = document.getElementById('plChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: ['MXN +10%', 'MXN +5%', 'Current', 'MXN -5%', 'MXN -10%'],
+                datasets: [{
+                    label: 'P&L Impact (USD 000s)',
+                    data: [240, 120, 0, -120, -240],
+                    backgroundColor: ['#059669', '#10b981', '#6b7280', '#f59e0b', '#dc2626']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     }
-                });
+                }
             }
-        }
+        });
+
+        const ctx4 = document.getElementById('portfolioChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'doughnut',
+            data: {
+                labels: ['AR', 'AP', 'Cash', 'Other'],
+                datasets: [{
+                    data: [18.5, 12.3, 3.1, 2.1],
+                    backgroundColor: ['#008080', '#f59e0b', '#059669', '#6b7280']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const rate = (18.2 + Math.random() * 0.6).toFixed(2);
+            const change = ((Math.random() - 0.5) * 2).toFixed(2);
+            document.getElementById('currentRate').textContent = rate;
+            document.getElementById('dailyChange').textContent = change + '%';
+        }, 10000);
     </script>
 </body>
 </html>
