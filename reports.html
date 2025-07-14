@@ -270,19 +270,32 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
+            font-size: 0.9rem;
         }
 
         .comparison-table th,
         .comparison-table td {
-            padding: 1rem;
-            text-align: left;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
             border-bottom: 1px solid #e5e7eb;
+            word-wrap: break-word;
         }
 
         .comparison-table th {
             background: #f8f9fa;
             font-weight: 600;
             color: #000000;
+            font-size: 0.85rem;
+        }
+
+        .comparison-table td:first-child,
+        .comparison-table th:first-child {
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
         }
 
         .checkmark {
@@ -342,7 +355,23 @@
             }
             
             .comparison-table {
-                font-size: 0.9rem;
+                font-size: 0.75rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.5rem 0.25rem;
+                min-width: 80px;
+            }
+
+            .comparison-table th:first-child,
+            .comparison-table td:first-child {
+                min-width: 120px;
+                white-space: normal;
+                padding-left: 0.5rem;
             }
         }
     </style>
@@ -391,7 +420,7 @@
         <div id="subscriptionInfo" class="subscription-info">
             <div class="tier-price" id="tierPrice">$500/month</div>
             <div class="tier-description" id="tierDescription">
-                Perfect for small companies with simple FX exposure. Get monthly risk reports and basic hedging recommendations.
+                Perfect for small companies with simple MXN exposure. Get monthly risk reports and basic hedging recommendations.
             </div>
             <a href="mailto:consulting@denarfinancial.com?subject=Subscription Inquiry - Basic Dashboard" class="upgrade-btn" id="upgradeBtn">
                 Subscribe to Basic Dashboard
@@ -553,7 +582,7 @@
             },
             standard: {
                 price: "$1,500/month",
-                description: "For companies with multiple entities and/or currencies. Includes AI forecasting, weekly updates, and quarterly strategy calls.",
+                description: "For companies with multiple entities or currencies. Includes AI forecasting, weekly updates, and quarterly strategy calls.",
                 button: "Subscribe to Standard Risk Management",
                 email: "consulting@denarfinancial.com?subject=Subscription Inquiry - Standard Risk Management"
             },
