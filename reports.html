@@ -1,11 +1,71 @@
-.mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Reports Library - Denar Financial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000000;
             color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #008080;
         }
 
         .mobile-menu-btn {
@@ -18,15 +78,196 @@
             padding: 0.5rem;
         }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #cccccc;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tier-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .tier-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid #008080;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tier-btn:hover,
+        .tier-btn.active {
+            background: #008080;
+            color: white;
+        }
+
+        .reports-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            color: #000000;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #008080;
+            padding-bottom: 0.5rem;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .report-title {
+            color: #000000;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .report-frequency {
+            display: inline-block;
+            background: #008080;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .access-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .access-included {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .access-locked {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .x-mark {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #008080;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .cta-button:hover {
+            background: #006666;
+        }
+
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
-            }
-
-            .nav {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
             }
 
             .nav-links {
@@ -83,3 +324,297 @@
                 padding: 0.5rem;
             }
         }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="assets/images/logo.png" alt="Denar Financial">
+                Denar Financial
+            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="calculator.html">Calculator</a></li>
+                <li><a href="reports.html">Reports</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">FX Reports Library</h1>
+        <p class="subtitle">Access comprehensive FX risk analysis based on your subscription tier</p>
+
+        <div class="tier-selector">
+            <button class="tier-btn active" onclick="showTier('basic')">Basic - $500/month</button>
+            <button class="tier-btn" onclick="showTier('standard')">Standard - $1,500/month</button>
+            <button class="tier-btn" onclick="showTier('premium')">Premium - $3,000/month</button>
+        </div>
+
+        <!-- Basic Tier Reports -->
+        <div id="basic-reports" class="reports-section">
+            <h2 class="section-title">Basic FX Dashboard Reports</h2>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">Monthly FX Risk Summary</div>
+                    <div class="report-description">Comprehensive overview of your FX exposure, risk metrics, and hedging recommendations</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">Currency Exposure Analysis</div>
+                    <div class="report-description">Detailed breakdown of your MXN positions and USD equivalent exposure</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">Basic Hedging Recommendations</div>
+                    <div class="report-description">AI-powered suggestions for simple hedging strategies to reduce FX risk</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Weekly</div>
+                    <div class="report-title">Weekly Market Outlook</div>
+                    <div class="report-description">Market trends and potential impacts on USD/MXN rates</div>
+                    <div class="access-badge access-locked">Upgrade Required</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Daily</div>
+                    <div class="report-title">Daily VaR Updates</div>
+                    <div class="report-description">Real-time Value at Risk calculations and alerts</div>
+                    <div class="access-badge access-locked">Upgrade Required</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Quarterly</div>
+                    <div class="report-title">Advanced Scenario Analysis</div>
+                    <div class="report-description">Stress testing and scenario planning for various market conditions</div>
+                    <div class="access-badge access-locked">Upgrade Required</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Standard Tier Reports -->
+        <div id="standard-reports" class="reports-section" style="display: none;">
+            <h2 class="section-title">Standard Risk Management Reports</h2>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-frequency">Weekly</div>
+                    <div class="report-title">Weekly Risk Updates</div>
+                    <div class="report-description">Enhanced weekly analysis with multi-entity tracking and forecasting</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Weekly</div>
+                    <div class="report-title">AI Forecasting Models</div>
+                    <div class="report-description">Machine learning predictions for USD/MXN movements and risk implications</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">VaR Analysis Report</div>
+                    <div class="report-description">Comprehensive Value at Risk analysis with confidence intervals and backtesting</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Quarterly</div>
+                    <div class="report-title">Multi-Entity Risk Tracking</div>
+                    <div class="report-description">Consolidated view of FX risk across multiple subsidiaries and entities</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Daily</div>
+                    <div class="report-title">Real-time Alerts</div>
+                    <div class="report-description">Instant notifications for significant market movements and risk threshold breaches</div>
+                    <div class="access-badge access-locked">Upgrade Required</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">Executive Dashboard</div>
+                    <div class="report-description">C-suite focused summary with strategic recommendations and ROI analysis</div>
+                    <div class="access-badge access-locked">Upgrade Required</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Tier Reports -->
+        <div id="premium-reports" class="reports-section" style="display: none;">
+            <h2 class="section-title">Premium AI Solutions Reports</h2>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-frequency">Daily</div>
+                    <div class="report-title">AI-Powered Daily Intelligence</div>
+                    <div class="report-description">Advanced AI analysis with predictive insights and automated recommendations</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Real-time</div>
+                    <div class="report-title">Live Risk Monitoring</div>
+                    <div class="report-description">Continuous monitoring with instant alerts and automatic hedge suggestions</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Weekly</div>
+                    <div class="report-title">Advanced Scenario Modeling</div>
+                    <div class="report-description">Sophisticated stress testing with Monte Carlo simulations and correlation analysis</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Monthly</div>
+                    <div class="report-title">Custom Strategy Reports</div>
+                    <div class="report-description">Tailored hedging strategies with implementation roadmaps and performance tracking</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">Quarterly</div>
+                    <div class="report-title">AI Training Progress</div>
+                    <div class="report-description">Track your team's progress in AI tools and prompt engineering capabilities</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-frequency">On-demand</div>
+                    <div class="report-title">Crisis Response Analysis</div>
+                    <div class="report-description">Emergency risk assessment and hedging recommendations for market disruptions</div>
+                    <div class="access-badge access-included">✓ Included</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison-section">
+            <h2 class="section-title">Feature Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Basic<br>$500/month</th>
+                        <th>Standard<br>$1,500/month</th>
+                        <th>Premium<br>$3,000/month</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Monthly Risk Reports</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Weekly Risk Updates</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Daily Intelligence</td>
+                        <td class="x-mark">✗</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>AI Forecasting Models</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>VaR Analysis</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Multi-Entity Tracking</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Real-time Monitoring</td>
+                        <td class="x-mark">✗</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Strategy Consultation Calls</td>
+                        <td class="x-mark">✗</td>
+                        <td>Quarterly</td>
+                        <td>Weekly</td>
+                    </tr>
+                    <tr>
+                        <td>Employee AI Training</td>
+                        <td class="x-mark">✗</td>
+                        <td class="x-mark">✗</td>
+                        <td class="checkmark">✓</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cta-section">
+            <h2 style="color: white; margin-bottom: 1rem;">Ready to Access These Reports?</h2>
+            <a href="mailto:consulting@denarfinancial.com?subject=Basic FX Dashboard Subscription" class="cta-button">Subscribe to Basic</a>
+            <a href="mailto:consulting@denarfinancial.com?subject=Standard Risk Management Subscription" class="cta-button">Subscribe to Standard</a>
+            <a href="mailto:consulting@denarfinancial.com?subject=Premium AI Solutions Subscription" class="cta-button">Subscribe to Premium</a>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking on a link
+        function closeMobileMenu() {
+            document.getElementById('navLinks').classList.remove('active');
+        }
+
+        function showTier(tier) {
+            // Hide all tier sections
+            document.getElementById('basic-reports').style.display = 'none';
+            document.getElementById('standard-reports').style.display = 'none';
+            document.getElementById('premium-reports').style.display = 'none';
+            
+            // Show selected tier
+            document.getElementById(tier + '-reports').style.display = 'block';
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.tier-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to nav links to close mobile menu
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            // Show Basic tier by default
+            showTier('basic');
+        });
+    </script>
+</body>
+</html>
