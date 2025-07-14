@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Risk Resources - Denar Financial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000000;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #008080;
+        }
+
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            color: #cccccc;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            color: #000000;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #008080;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .resource-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #008080;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .resource-type {
+            display: inline-block;
+            background: #008080;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .resource-title {
+            color: #000000;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .download-btn {
+            background: #008080;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background: #006666;
+            color: white;
+            text-decoration: none;
+        }
+
+        .podcast-player {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .podcast-placeholder {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .coming-soon {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #000000;
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 0.75rem;
+                border-bottom: 1px solid #333;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="assets/images/logo.png" alt="Denar Financial">
+                Denar Financial
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="calculator.html">Calculator</a></li>
+                <li><a href="reports.html">Reports</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <button class="mobile-menu" onclick="toggleMobileMenu()">☰</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">FX Risk Resources</h1>
+            <p class="page-subtitle">Expert insights, tools, and training to master foreign exchange risk management</p>
+        </div>
+
+        <!-- Written Resources Section -->
+        <section class="section">
+            <h2 class="section-title">📄 Written Resources & Guides</h2>
+            <p class="section-description">
+                Comprehensive guides and checklists to help you identify, measure, and manage FX risk in your organization.
+            </p>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-type">PDF Guide</div>
+                    <h3 class="resource-title">10 Warning Signs Your Company Needs FX Hedging</h3>
+                    <p class="resource-description">
+                        A comprehensive checklist to help you identify whether your company has material FX risk that demands attention. If you recognize three or more warning signs, it's time to take action.
+                    </p>
+                    <div class="resource-meta">
+                        <span>📊 18 pages • 📅 January 2025</span>
+                        <span>🔥 Most Popular</span>
+                    </div>
+                    <a href="resources/10-warning-signs-fx-hedging.pdf" class="download-btn" download>
+                        📥 Download PDF
+                    </a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-type">PDF Checklist</div>
+                    <h3 class="resource-title">FX Risk Assessment Checklist for CFOs</h3>
+                    <p class="resource-description">
+                        A practical step-by-step checklist to evaluate your company's foreign exchange risk exposure and determine the right hedging strategy for your business.
+                    </p>
+                    <div class="resource-meta">
+                        <span>📋 8 pages • 📅 Coming Soon</span>
+                        <span class="coming-soon">In Development</span>
+                    </div>
+                    <a href="#" class="download-btn" style="opacity: 0.6; cursor: not-allowed;">
+                        📥 Coming Soon
+                    </a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-type">Technical Guide</div>
+                    <h3 class="resource-title">Understanding VaR: A Manager's Guide</h3>
+                    <p class="resource-description">
+                        Demystify Value at Risk calculations and learn how to use VaR effectively for FX risk management decision-making.
+                    </p>
+                    <div class="resource-meta">
+                        <span>📈 12 pages • 📅 Coming Soon</span>
+                        <span class="coming-soon">Planned</span>
+                    </div>
+                    <a href="#" class="download-btn" style="opacity: 0.6; cursor: not-allowed;">
+                        📥 Coming Soon
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Podcast Section -->
+        <section class="section">
+            <h2 class="section-title">🎧 FX Risk Management Podcast</h2>
+            <p class="section-description">
+                Listen to expert insights and real-world case studies on managing foreign exchange risk. Perfect for busy executives who want to stay informed on the go.
+            </p>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-type">Podcast Episode</div>
+                    <h3 class="resource-title">Episode 1: The Hidden Cost of Ignoring FX Risk</h3>
+                    <p class="resource-description">
+                        Based on our "10 Warning Signs" guide, we explore real examples of companies that learned about FX risk the hard way and what you can do to avoid their mistakes.
+                    </p>
+                    <div class="resource-meta">
+                        <span>🎙️ 15 minutes • 📅 Coming Soon</span>
+                        <span class="coming-soon">In Production</span>
+                    </div>
+                    <div class="podcast-placeholder">
+                        <p>🎵 Podcast player will appear here once the episode is published</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Subscribe to be notified when episodes are available</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-type">Podcast Episode</div>
+                    <h3 class="resource-title">Episode 2: AI-Powered FX Forecasting</h3>
+                    <p class="resource-description">
+                        How artificial intelligence is transforming currency risk management and what treasury professionals need to know about implementing AI tools.
+                    </p>
+                    <div class="resource-meta">
+                        <span>🎙️ ~20 minutes • 📅 Planned</span>
+                        <span class="coming-soon">Planned</span>
+                    </div>
+                    <div class="podcast-placeholder">
+                        <p>🎵 Episode in planning phase</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="section" style="text-align: center; background: #f8f9fa;">
+            <h2 style="color: #000000; margin-bottom: 1rem;">Want More Resources?</h2>
+            <p style="color: #666; margin-bottom: 2rem; font-size: 1.1rem;">
+                Get personalized FX risk insights and recommendations based on your specific business needs.
+            </p>
+            <a href="calculator.html" class="download-btn" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                🧮 Try Our Risk Calculator
+            </a>
+            <a href="mailto:consulting@denarfinancial.com?subject=Custom Resource Request" class="download-btn" style="padding: 1rem 2rem; font-size: 1.1rem; margin-left: 1rem; background: #000000;">
+                📧 Request Custom Analysis
+            </a>
+        </section>
+    </div>
+
+    <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking on a link
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    document.getElementById('navLinks').classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
