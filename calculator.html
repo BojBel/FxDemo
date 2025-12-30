@@ -1,678 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FX Risk Calculator - Denar Financial</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+// FX Rate Auto-Update System
+// Uses Exchange Rate API (free, no auth required)
+
+const FX_RATES = {
+    API_URL: 'https://api.exchangerate-api.com/v4/latest/USD',
+    UPDATE_INTERVAL: 300000, // 5 minutes
+    
+    async fetchRates() {
+        try {
+            const response = await fetch(this.API_URL);
+            const data = await response.json();
+            return data.rates;
+        } catch (error) {
+            console.error('Failed to fetch FX rates:', error);
+            return null;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            min-height: 100vh;
+    },
+    
+    async updateMXNRate() {
+        const rates = await this.fetchRates();
+        if (!rates || !rates.MXN) {
+            console.error('MXN rate not available');
+            return;
         }
-
-        .header {
-            background: #000000;
-            color: white;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .logo img {
-            height: 40px;
-            width: auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #008080;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .page-title {
-            color: white;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .subtitle {
-            color: #cccccc;
-            font-size: 1.2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .demo-note {
-            color: #666;
-            font-style: italic;
-            font-size: 0.9rem;
-            text-align: center;
-            margin: 1rem 0;
-        }
-
-        .calculator-section {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .section-title {
-            color: #000000;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            border-bottom: 3px solid #008080;
-            padding-bottom: 0.5rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 0.8rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #008080;
-        }
-
-        .calculate-btn {
-            background: #008080;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-        }
-
-        .calculate-btn:hover {
-            background: #006666;
-        }
-
-        .results {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #008080;
-        }
-
-        .risk-level {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .risk-low { background: #d4edda; color: #155724; }
-        .risk-medium { background: #fff3cd; color: #856404; }
-        .risk-high { background: #f8d7da; color: #721c24; }
-        .risk-critical { background: #f5c6cb; color: #721c24; }
-
-        /* Lead Capture Styles */
-        .lead-capture {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 2rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-            border: 2px solid #008080;
-            text-align: center;
-        }
-
-        .lead-capture h3 {
-            color: #000000;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .lead-capture p {
-            color: #374151;
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-        }
-
-        .results-summary {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #008080;
-            text-align: left;
-        }
-
-        .results-summary h4 {
-            color: #000000;
-            margin-bottom: 1rem;
-        }
-
-        .results-summary p {
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .airtable-btn {
-            display: inline-block;
-            background: #008080;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-bottom: 1rem;
-        }
-
-        .airtable-btn:hover {
-            background: #006666;
-        }
-
-        .form-note {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <nav class="nav">
-            <div class="logo">
-                <img src="assets/images/logo.png" alt="Denar Financial">
-                Denar Financial
-            </div>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="index.html">Dashboard</a></li>
-                <li><a href="index.html#services">Services</a></li>
-                <li><a href="calculator.html">Calculator</a></li>
-                <li><a href="reports.html">Reports</a></li>
-                <li><a href="resources.html">Resources</a></li>
-                <li><a href="index.html#contact">Contact</a></li>
-            </ul>
-    </header>
-
-    <div class="container">
-        <h1 class="page-title">FX Risk Calculator</h1>
-        <p class="subtitle">Get an instant assessment of your foreign exchange risk exposure</p>
-        <p class="demo-note">(Mexican Peso exposure used for Demo purposes)</p>
-
-        <!-- FX Risk Calculator -->
-        <section class="calculator-section">
-            <h2 class="section-title">Step 1: Calculate Your FX Risk Exposure</h2>
+        
+        const mxnRate = rates.MXN;
+        const rateInput = document.getElementById('currentRate');
+        const lastUpdateElement = document.getElementById('lastUpdate');
+        
+        if (rateInput) {
+            rateInput.value = mxnRate.toFixed(2);
             
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="revenue">Annual Company Revenue (USD)</label>
-                    <input type="number" id="revenue" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="industry">Industry</label>
-                    <select id="industry">
-                        <option value="">Select Industry</option>
-                        <option value="manufacturing">Manufacturing</option>
-                        <option value="retail">Retail</option>
-                        <option value="technology">Technology</option>
-                        <option value="services">Services</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="ar">Accounts Receivable in Mexico (MXN)</label>
-                    <input type="number" id="ar" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="ap">Accounts Payable in Mexico (MXN)</label>
-                    <input type="number" id="ap" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="cash">Cash Position in Mexico (MXN)</label>
-                    <input type="number" id="cash" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="monthlyRevenue">Monthly Revenue in Mexico (MXN)</label>
-                    <input type="number" id="monthlyRevenue" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="monthlyExpenses">Monthly Expenses in Mexico (MXN)</label>
-                    <input type="number" id="monthlyExpenses" placeholder="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="currentRate">Current USD/MXN Rate</label>
-                    <input type="number" id="currentRate" step="0.01" value="18.45" placeholder="18.45" readonly style="background-color: #f8f9fa; color: #666;">
-                    <small style="color: #666; font-size: 0.8rem;">Auto-updated from live market data</small>
-                </div>
-            </div>
-
-            <button class="calculate-btn" onclick="calculateRisk()">Calculate FX Risk</button>
-
-            <div id="riskResults" class="results" style="display: none;">
-                <!-- Risk results will appear here -->
-            </div>
-
-            <!-- Lead Capture Section -->
-            <div id="leadCapture" class="lead-capture" style="display: none;">
-                <h3>📊 Get Your Detailed FX Risk Report</h3>
-                <p>Your results show <strong><span id="riskLevelDisplay"></span></strong> risk level. Get a comprehensive PDF analysis with personalized recommendations based on your specific risk profile.</p>
-                
-                <div class="results-summary">
-                    <h4>Your Assessment Summary:</h4>
-                    <p><strong>Risk Level:</strong> <span id="summaryRiskLevel"></span></p>
-                    <p><strong>Total FX Exposure:</strong> $<span id="summaryExposure"></span></p>
-                    <p><strong>Monthly Value at Risk:</strong> $<span id="summaryVaR"></span></p>
-                    <p><strong>Recommended Service:</strong> <span id="summaryService"></span></p>
-                </div>
-                
-                <a href="https://airtable.com/appn7guymXXzmpvly/pagKYzcm4hRbPJhGh/form" 
-                   target="_blank" 
-                   class="airtable-btn">
-                    📧 Get My Detailed FX Risk Report
-                </a>
-                
-                <p class="form-note">Opens in new tab • Takes 2 minutes • Receive report within 2 business days</p>
-            </div>
-        </section>
-
-        <!-- ROI Calculator -->
-        <section class="calculator-section">
-            <h2 class="section-title">Step 2: Calculate Service ROI</h2>
-            
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="roiExposure">Annual FX Exposure (USD)</label>
-                    <input type="number" id="roiExposure" placeholder="Auto-populated from risk calculator above">
-                </div>
-
-                <div class="form-group">
-                    <label for="currentHedging">Current Hedging Strategy</label>
-                    <select id="currentHedging">
-                        <option value="0">No hedging (0% protected)</option>
-                        <option value="25">Basic hedging (25% protected)</option>
-                        <option value="50">Moderate hedging (50% protected)</option>
-                        <option value="75">Advanced hedging (75% protected)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="riskTolerance">Risk Tolerance</label>
-                    <select id="riskTolerance">
-                        <option value="conservative">Conservative (minimize risk)</option>
-                        <option value="moderate">Moderate (balanced approach)</option>
-                        <option value="aggressive">Aggressive (accept higher risk)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="serviceTier">Service Tier</label>
-                    <select id="serviceTier">
-                        <option value="500">Basic FX Dashboard ($500/month)</option>
-                        <option value="1500">Standard Risk Management ($1,500/month)</option>
-                        <option value="3000">Premium AI Solutions ($3,000/month)</option>
-                    </select>
-                </div>
-            </div>
-
-            <button class="calculate-btn" onclick="calculateROI()">Calculate ROI</button>
-
-            <div id="roiResults" class="results" style="display: none;">
-                <!-- ROI results will appear here -->
-            </div>
-        </section>
-    </div>
-
-    <script>
-        function calculateRisk() {
-            try {
-                // Get input values and validate they're not empty
-                const revenue = parseFloat(document.getElementById('revenue').value);
-                const ar = parseFloat(document.getElementById('ar').value);
-                const ap = parseFloat(document.getElementById('ap').value);
-                const cash = parseFloat(document.getElementById('cash').value);
-                const monthlyRevenue = parseFloat(document.getElementById('monthlyRevenue').value);
-                const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
-                const currentRate = parseFloat(document.getElementById('currentRate').value) || 18.45;
-
-                // Check if required fields are filled
-                if (!revenue || isNaN(revenue) || revenue <= 0) {
-                    alert('Please enter your Annual Company Revenue');
-                    return;
-                }
-
-                if (isNaN(ar) || isNaN(ap) || isNaN(cash) || isNaN(monthlyRevenue) || isNaN(monthlyExpenses)) {
-                    alert('Please fill in all the Mexican operations fields with valid numbers (use 0 if not applicable)');
-                    return;
-                }
-
-                // Calculate net exposure
-                const netOperationalExposure = (monthlyRevenue - monthlyExpenses) * 3; // 3 months forward
-                const totalMXNExposure = ar - ap + cash + netOperationalExposure;
-                const netExposureUSD = totalMXNExposure / currentRate;
-
-                // Calculate exposure as percentage of revenue
-                const exposurePercent = (Math.abs(netExposureUSD) / revenue) * 100;
-
-                // Calculate VaR (Value at Risk)
-                const volatility = 0.015; // 1.5% daily volatility
-                const zScore = 1.65; // 95% confidence
-                const dailyVaR = Math.abs(netExposureUSD) * volatility * zScore;
-                const monthlyVaR = dailyVaR * Math.sqrt(22); // 22 trading days
-
-                // Determine risk level
-                let riskLevel = 'Low';
-                let riskClass = 'risk-low';
-                
-                if (exposurePercent > 15 || (monthlyVaR / revenue * 100) > 2) {
-                    riskLevel = 'Critical';
-                    riskClass = 'risk-critical';
-                } else if (exposurePercent > 10 || (monthlyVaR / revenue * 100) > 1.5) {
-                    riskLevel = 'High';
-                    riskClass = 'risk-high';
-                } else if (exposurePercent > 5 || (monthlyVaR / revenue * 100) > 1) {
-                    riskLevel = 'Medium';
-                    riskClass = 'risk-medium';
-                }
-
-                // Scenarios
-                const scenarios = {
-                    'Peso strengthens 10%': (netExposureUSD * 0.10).toFixed(0),
-                    'Peso strengthens 5%': (netExposureUSD * 0.05).toFixed(0),
-                    'Current rate': '0',
-                    'Peso weakens 5%': (netExposureUSD * -0.05).toFixed(0),
-                    'Peso weakens 10%': (netExposureUSD * -0.10).toFixed(0)
-                };
-
-                // Service recommendation
-                let recommendedService = 'Basic FX Dashboard';
-                if (riskLevel === 'Critical' || revenue > 50000000) {
-                    recommendedService = 'Premium AI Solutions';
-                } else if (riskLevel === 'High' || revenue > 20000000) {
-                    recommendedService = 'Standard Risk Management';
-                }
-
-                // Display results
-                const resultsDiv = document.getElementById('riskResults');
-                resultsDiv.innerHTML = `
-                    <h3>Your FX Risk Assessment</h3>
-                    <div class="risk-level ${riskClass}">Risk Level: ${riskLevel}</div>
-                    
-                    <p><strong>Net FX Exposure:</strong> $${Math.abs(netExposureUSD).toLocaleString()} USD</p>
-                    <p><strong>Exposure as % of Revenue:</strong> ${exposurePercent.toFixed(1)}%</p>
-                    <p><strong>Monthly Value at Risk (95%):</strong> $${monthlyVaR.toLocaleString()}</p>
-                    
-                    <h4>Potential Impact Scenarios:</h4>
-                    <ul>
-                        ${Object.entries(scenarios).map(([scenario, impact]) => 
-                            `<li>${scenario}: ${impact >= 0 ? '+' : ''}$${Math.abs(impact).toLocaleString()}</li>`
-                        ).join('')}
-                    </ul>
-                    
-                    <p><strong>Recommended Service:</strong> ${recommendedService}</p>
-                    <p><a href="mailto:consulting@denarfinancial.com?subject=FX Risk Assessment Follow-up">Schedule Free Consultation →</a></p>
-                `;
-                resultsDiv.style.display = 'block';
-
-                // Show lead capture with results summary
-                showLeadCapture(riskLevel, Math.abs(netExposureUSD), monthlyVaR, recommendedService);
-
-                // Auto-populate ROI calculator with the actual exposure
-                document.getElementById('roiExposure').value = Math.abs(netExposureUSD).toFixed(0);
-                
-                // Auto-calculate ROI after a brief delay
-                setTimeout(calculateROI, 500);
-
-            } catch (error) {
-                console.error('Risk calculation error:', error);
-                alert('Please check your inputs and try again.');
-            }
-        }
-
-        function showLeadCapture(riskLevel, exposureUSD, monthlyVaR, recommendedService) {
-            // Show the lead capture section
-            const leadCaptureDiv = document.getElementById('leadCapture');
-            leadCaptureDiv.style.display = 'block';
-            
-            // Populate the summary
-            document.getElementById('riskLevelDisplay').textContent = riskLevel;
-            document.getElementById('summaryRiskLevel').textContent = riskLevel;
-            document.getElementById('summaryExposure').textContent = exposureUSD.toLocaleString();
-            document.getElementById('summaryVaR').textContent = monthlyVaR.toLocaleString();
-            document.getElementById('summaryService').textContent = recommendedService;
-            
-            // Scroll to the form after a brief delay
+            // Visual feedback - flash the input
+            rateInput.style.backgroundColor = '#d4f4dd';
             setTimeout(() => {
-                leadCaptureDiv.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-            }, 500);
+                rateInput.style.backgroundColor = '';
+            }, 1000);
         }
-
-        function calculateROI() {
-            try {
-                // Get values
-                const exposure = parseFloat(document.getElementById('roiExposure').value) || 0;
-                const hedgingPercent = parseFloat(document.getElementById('currentHedging').value) || 0;
-                const riskTolerance = document.getElementById('riskTolerance').value;
-                const serviceCost = parseFloat(document.getElementById('serviceTier').value) || 1500;
-
-                if (exposure === 0) {
-                    return; // Silently return if no exposure
-                }
-
-                // Adjust volatility assumption based on risk tolerance
-                let annualVolatility;
-                switch(riskTolerance) {
-                    case 'conservative':
-                        annualVolatility = 0.08; // 8% - conservative estimate
-                        break;
-                    case 'moderate':
-                        annualVolatility = 0.12; // 12% - moderate estimate
-                        break;
-                    case 'aggressive':
-                        annualVolatility = 0.16; // 16% - aggressive estimate
-                        break;
-                    default:
-                        annualVolatility = 0.12;
-                }
-
-                // Calculate potential annual loss
-                const potentialLoss = exposure * annualVolatility;
-                const currentProtection = potentialLoss * (hedgingPercent / 100);
-                const unprotectedRisk = potentialLoss - currentProtection;
-
-                // Calculate service benefits (adjust based on service tier)
-                let riskReduction;
-                switch(serviceCost) {
-                    case 500:
-                        riskReduction = 0.50; // Basic: 50% risk reduction
-                        break;
-                    case 1500:
-                        riskReduction = 0.70; // Standard: 70% risk reduction
-                        break;
-                    case 3000:
-                        riskReduction = 0.85; // Premium: 85% risk reduction
-                        break;
-                    default:
-                        riskReduction = 0.70;
-                }
-
-                const additionalProtection = unprotectedRisk * riskReduction;
-                const annualServiceCost = serviceCost * 12;
-
-                // Calculate ROI
-                const netSavings = additionalProtection - annualServiceCost;
-                const roi = annualServiceCost > 0 ? ((additionalProtection - annualServiceCost) / annualServiceCost * 100) : 0;
-                const paybackDays = additionalProtection > 0 ? (annualServiceCost / additionalProtection * 365) : 999;
-
-                // Get service tier name
-                const serviceTierNames = {
-                    500: 'Basic FX Dashboard',
-                    1500: 'Standard Risk Management', 
-                    3000: 'Premium AI Solutions'
-                };
-                const serviceName = serviceTierNames[serviceCost];
-
-                // Display results
-                const roiResultsDiv = document.getElementById('roiResults');
-                roiResultsDiv.innerHTML = `
-                    <h3>ROI Analysis - ${serviceName}</h3>
-                    
-                    <p><strong>Risk Assessment (${riskTolerance} approach):</strong></p>
-                    <ul>
-                        <li>Estimated annual volatility: ${(annualVolatility * 100).toFixed(0)}%</li>
-                        <li>Potential annual loss at risk: $${potentialLoss.toLocaleString()}</li>
-                        <li>Current protection: ${hedgingPercent}% (saving $${currentProtection.toLocaleString()})</li>
-                        <li>Remaining unprotected risk: $${unprotectedRisk.toLocaleString()}</li>
-                    </ul>
-                    
-                    <p><strong>With Our ${serviceName}:</strong></p>
-                    <ul>
-                        <li>Additional risk reduction: ${(riskReduction * 100).toFixed(0)}%</li>
-                        <li>Additional annual protection: $${additionalProtection.toLocaleString()}</li>
-                        <li>Annual service cost: $${annualServiceCost.toLocaleString()}</li>
-                        <li>Net annual savings: $${netSavings.toLocaleString()}</li>
-                    </ul>
-                    
-                    <div style="background: ${netSavings > 0 ? '#e8f5e8' : '#f0f8ff'}; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                        <p><strong>ROI: ${roi.toFixed(0)}%</strong></p>
-                        <p><strong>Payback period: ${paybackDays < 365 ? paybackDays.toFixed(0) + ' days' : 'More than 1 year'}</strong></p>
-                        ${netSavings > 0 ? 
-                            '<p style="color: #155724;"><strong>✓ Positive ROI - Service recommended</strong></p>' : 
-                            '<p style="color: #1a5490;"><strong>💡 High-risk exposure requires strategic approach - Let Denar Financial design a comprehensive risk management plan using our Premium AI Solutions to optimize your hedging strategy and minimize potential losses.</strong></p>'
-                        }
-                    </div>
-                    
-                    <p><a href="mailto:consulting@denarfinancial.com?subject=ROI Analysis - ${serviceName}">Get Started with ${serviceName} →</a></p>
-                `;
-                roiResultsDiv.style.display = 'block';
-
-            } catch (error) {
-                console.error('ROI calculation error:', error);
-            }
+        
+        if (lastUpdateElement) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            lastUpdateElement.textContent = `Last updated: ${timeString}`;
         }
-
-        // Simulate live FX rate updates (same as homepage dashboard)
-        function updateFXRate() {
-            const baseRate = 18.45;
-            const variation = (Math.random() - 0.5) * 0.1;
-            const newRate = (baseRate + variation).toFixed(2);
-            
-            // Update the rate field
-            const rateField = document.getElementById('currentRate');
-            if (rateField) {
-                rateField.value = newRate;
-            }
+        
+        // Trigger recalculation if there's data
+        const revenue = document.getElementById('companyRevenue')?.value;
+        if (revenue && parseFloat(revenue) > 0) {
+            calculateRisk();
         }
+    },
+    
+    startAutoUpdate() {
+        // Update immediately on load
+        this.updateMXNRate();
+        
+        // Then update every 5 minutes
+        setInterval(() => {
+            this.updateMXNRate();
+        }, this.UPDATE_INTERVAL);
+    },
+    
+    manualRefresh() {
+        this.updateMXNRate();
+    }
+};
 
-        // Initialize rate updates when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Update rate every 10 seconds to match homepage
-            setInterval(updateFXRate, 10000);
-        });
-    </script>
-</body>
-</html>
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    FX_RATES.startAutoUpdate();
+});
