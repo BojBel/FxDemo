@@ -655,23 +655,43 @@
             }
         }
 
-        // Simulate live FX rate updates (same as homepage dashboard)
-        function updateFXRate() {
-            const baseRate = 18.45;
-            const variation = (Math.random() - 0.5) * 0.1;
-            const newRate = (baseRate + variation).toFixed(2);
-            
-            // Update the rate field
-            const rateField = document.getElementById('currentRate');
-            if (rateField) {
-                rateField.value = newRate;
+        // Real FX Rate Updates using Free API
+        async function updateFXRate() {
+            try {
+                const response = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=MXN');
+                const data = await response.json();
+                const mxnRate = data.rates.MXN;
+                
+                const rateField = document.getElementById('currentRate');
+                if (rateField) {
+                    rateField.value = mxnRate.toFixed(2);
+                    
+                    // Visual flash
+                    rateField.style.backgroundColor = '#d4f4dd';
+                    setTimeout(() => {
+                        rateField.style.backgroundColor = '';
+                    }, 1000);
+                }
+                
+                // Update timestamp
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                console.log('Rate updated:', mxnRate, 'at', timeString);
+                
+            } catch (error) {
+                console.error('Failed to fetch rate:', error);
             }
         }
 
         // Initialize rate updates when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Update rate every 10 seconds to match homepage
-            setInterval(updateFXRate, 10000);
+            // Update immediately
+            updateFXRate();
+            // Then update every 5 minutes
+            setInterval(updateFXRate, 300000);
         });
     </script>
 </body>
